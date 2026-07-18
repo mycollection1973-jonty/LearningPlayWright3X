@@ -22,6 +22,19 @@ Operators in JavaScript — covers:
 - Arithmetic, assignment, and comparison operators
 - Logical operators
 - Confusing comparisons (type coercion)
+- Increment & decrement operators (prefix/postfix)
+- Nullish coalescing operator (`??`)
+- IQ notes on operator concepts
+
+### 06_Statement
+Statements and conditionals in JavaScript — covers:
+- Conditional logic with multiple conditions
+- IQ notes on statement concepts
+
+### Practice_Code
+Practice coding exercises — includes:
+- `01_187.js` — Number-based practice problem
+- `02_Triangle.js` — Triangle-related logic exercise
 
 ### IQ_Notes
 Conceptual notes and reference material:
