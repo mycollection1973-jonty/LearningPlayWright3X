@@ -43,6 +43,20 @@ Conceptual notes and reference material:
 - Windows commands
 - Source code / bytecode / binary concepts
 
+### 07_chapter_Switch
+Switch statements in JavaScript — covers:
+- Basic switch cases
+- Real-world API testing with switch
+- Switch grouping
+- IQ notes on switch concepts
+
+### 08_UserInputs
+User input handling in JavaScript — covers:
+- Basic JS input with `prompt()`
+- Node.js UI with `readline`
+- `readline.prompt()` patterns
+- File system (`fs`) concepts and operations
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
