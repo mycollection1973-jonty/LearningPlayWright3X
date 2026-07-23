@@ -54,12 +54,19 @@ Switch statements in JavaScript — covers:
 - Switch grouping
 - IQ notes on switch concepts
 
-### 08_UserInputs
+### 08_chapter_UserInputs
 User input handling in JavaScript — covers:
 - Basic JS input with `prompt()`
 - Node.js UI with `readline`
 - `readline.prompt()` patterns
 - File system (`fs`) concepts and operations
+
+### 09_chapter_Loops
+Loop constructs in JavaScript — covers:
+- Basic loops (`for`, `while`, `do-while`)
+- Increment patterns
+- Nested loops
+- Loop comparisons and use cases
 
 ### PlayWright
 Playwright and automation-related material:
