@@ -72,6 +72,15 @@ Loop constructs in JavaScript — covers:
 Multiple choice questions for self-assessment:
 - `Array_MCQ.md` — Array-related MCQ for JavaScript fundamentals
 
+### 10_chapter_Arrays
+Arrays in JavaScript — covers:
+- Array creation and access
+- Adding and removing elements
+- Searching arrays
+- Array iteration
+- Real-world array usage
+- IQ notes on array concepts
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
