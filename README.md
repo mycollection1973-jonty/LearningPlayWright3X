@@ -68,6 +68,10 @@ Loop constructs in JavaScript — covers:
 - Nested loops
 - Loop comparisons and use cases
 
+### MCQ
+Multiple choice questions for self-assessment:
+- `Array_MCQ.md` — Array-related MCQ for JavaScript fundamentals
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
