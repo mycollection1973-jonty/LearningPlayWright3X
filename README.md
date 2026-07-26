@@ -46,6 +46,7 @@ Conceptual notes and reference material:
 - Keyword notes
 - Windows commands
 - Source code / bytecode / binary concepts
+- Array functions reference with examples
 
 ### 07_chapter_Switch
 Switch statements in JavaScript — covers:
