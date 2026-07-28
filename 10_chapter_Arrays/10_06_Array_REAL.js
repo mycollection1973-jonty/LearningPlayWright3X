@@ -1,14 +1,14 @@
 //25-07-2026
 
 let browser = ["chrome","firefox","safari","opera","edge"];
-console.log(browser.length);
+console.log(browser.length); //5
 
 browser.pop();
-//console.log(browser);
+//console.log(browser);  // [ 'chrome', 'firefox', 'safari', 'opera' ]
 
 let removed = browser.shift();
-// console.log(browser);
-// console.log(removed);
+// console.log(browser);  //[ 'firefox', 'safari', 'opera', 'edge' ]
+// console.log(removed);  // chrome
 
 for(  let i=0;i<browser.length;i++)
 {

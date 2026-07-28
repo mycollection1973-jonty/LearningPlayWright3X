@@ -9,7 +9,7 @@ results.indexOf("skip");  //-1
 
 // lastIndexOf — searches from the end
 results.lastIndexOf("fail");
-//console.log(results.lastIndexOf("fail"));
+//console.log(results.lastIndexOf("fail")); //4
 
 // includes — returns boolean
 results.includes("error"); // true
