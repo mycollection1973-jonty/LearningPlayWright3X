@@ -79,6 +79,12 @@ Arrays in JavaScript — covers:
 - Adding and removing elements
 - Searching arrays
 - Array iteration
+- Array transformation (`map`, `filter`, `reduce`)
+- Sorting arrays
+- Slicing and concatenation
+- Array checking methods
+- Copying arrays (shallow/deep)
+- Destructuring arrays
 - Real-world array usage
 - IQ notes on array concepts
 

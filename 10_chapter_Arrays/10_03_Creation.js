@@ -6,6 +6,7 @@ let browsers = ["chrome","safari","firefox"];
 
 //Array constructor
 let scores = new Array(3); // creates [empty x 3]
+console.log(scores);
 let scores2 = new Array(1,2,3); // creates [1,2,3]
 
 let numbers = new Array(100,200,300,400);
