@@ -39,6 +39,13 @@ Practice coding exercises — includes:
 - `04_Hackerrank_Switch.js` — HackerRank switch statement practice
 - `05_FizzBuzz.js` — FizzBuzz classic problem
 - `06_Loop.js` — Loop-based practice exercises
+- `07_MaxNumber_Array.js` — Find the maximum number in an array
+- `08_Frequency_Array.js` — Frequency of each element in an array
+- `09_Reverse_Array.js` — Reverse array elements
+- `10_Pallindrome_Array.js` — Palindrome check
+- `11_PrimeNum.js` — Prime number checker
+- `12_VowelConst_Array.js` — Vowel and consonant counter
+- `13_Pyramid.js` — Pyramid star pattern
 - `14_LeftTriangle.js` — Left-aligned triangle pattern
 - `15_RightTriangle.js` — Right-aligned triangle pattern
 - `16_LeapYear.js` — Leap year checker
