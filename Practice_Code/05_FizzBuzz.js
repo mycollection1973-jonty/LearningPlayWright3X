@@ -5,7 +5,7 @@ for(let i=1;i<=data;i++)
 {
     if(i%3==0 && i%5==0)
     {
-        console.log("FizBuzz");
+        console.log("FizzBuzz");
     }
     else if(i%3==0 && i%5!=0)
     {

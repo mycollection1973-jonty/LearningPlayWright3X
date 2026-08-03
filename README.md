@@ -34,11 +34,14 @@ Statements and conditionals in JavaScript — covers:
 ### Practice_Code
 Practice coding exercises — includes:
 - `01_187.js` — Number-based practice problem
-- `02_Triangle.js` — Triangle-related logic exercise
+- `02_Triangle_Classifier.js` — Triangle classification (equilateral/isoceles/scalene)
 - `03_Hackerrank_IfElse.js` — HackerRank if-else conditionals
 - `04_Hackerrank_Switch.js` — HackerRank switch statement practice
 - `05_FizzBuzz.js` — FizzBuzz classic problem
 - `06_Loop.js` — Loop-based practice exercises
+- `14_LeftTriangle.js` — Left-aligned triangle pattern
+- `15_RightTriangle.js` — Right-aligned triangle pattern
+- `16_LeapYear.js` — Leap year checker
 
 ### IQ_Notes
 Conceptual notes and reference material:
