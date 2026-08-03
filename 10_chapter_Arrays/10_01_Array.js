@@ -2,6 +2,7 @@
 
 let fruit = [];
 let browsers = ["chrome", "firefox", "edge"];
+console.log(typeof browsers);
 
 console.log(browsers[0]);  // chrome
 console.log(browsers.at(-1));  // edge

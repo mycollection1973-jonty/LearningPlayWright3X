@@ -88,6 +88,15 @@ Arrays in JavaScript — covers:
 - Real-world array usage
 - IQ notes on array concepts
 
+### 11_chapter_Functions
+Functions in JavaScript — covers:
+- Basic function definitions and parameters/arguments
+- Function types (basic, function expressions)
+- Template literals
+- Arrow functions
+- Immediately Invoked Function Expressions (IIFE)
+- Real-world function usage
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
