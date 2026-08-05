@@ -7,3 +7,5 @@ function greet (name)
 
 let op = greet("Jenny");
 console.log(op);  // Hello. Jenny
+
+//console.log(greet("Hay"));

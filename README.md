@@ -106,6 +106,13 @@ Functions in JavaScript — covers:
 - Arrow functions
 - Immediately Invoked Function Expressions (IIFE)
 - Real-world function usage
+- Spread operator with functions (rest parameters)
+- Return statements and returned values (undefined, arrays)
+- `var` vs `let` vs `const` — scoping (function vs block scope)
+- Hoisting — `var`, `let`, `const`, and function hoisting
+- Temporal Dead Zone (TDZ)
+- IQ notes on scoping and hoisting
+- Hoisting & TDZ complete reference notes
 
 ### PlayWright
 Playwright and automation-related material:

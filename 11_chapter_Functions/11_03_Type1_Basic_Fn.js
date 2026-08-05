@@ -17,6 +17,7 @@ greet();  // Hey
 
 let output = greet();  // Hey
 console.log(output);  // undefined
+console.log(typeof output); // undefined
 
 
 function openBrowser()
