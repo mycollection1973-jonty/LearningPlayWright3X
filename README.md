@@ -113,6 +113,21 @@ Functions in JavaScript — covers:
 - Temporal Dead Zone (TDZ)
 - IQ notes on scoping and hoisting
 - Hoisting & TDZ complete reference notes
+- IQ notes on function expressions (not hoisted)
+
+### 12_chapter_Fn_Closure
+Closures in JavaScript — covers:
+- Scope inside functions (global vs local)
+- Returning inner functions
+- Closures remembering state (counter)
+- Real-world closures (retry tracker, rate limiter)
+
+### 13_chapter_String
+Strings in JavaScript — covers:
+- String creation (single/double quotes, template literals)
+- String conversion (`String()`) and multiline strings
+- String properties and access (`length`, indexing, `at()`, `charAt()`, `charCodeAt()`)
+- String searching (`includes`, `startsWith`, `endsWith`, `indexOf`, `lastIndexOf`)
 
 ### PlayWright
 Playwright and automation-related material:
