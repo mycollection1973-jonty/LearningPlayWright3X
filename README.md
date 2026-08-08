@@ -42,13 +42,16 @@ Practice coding exercises — includes:
 - `07_MaxNumber_Array.js` — Find the maximum number in an array
 - `08_Frequency_Array.js` — Frequency of each element in an array
 - `09_Reverse_Array.js` — Reverse array elements
-- `10_Pallindrome_Array.js` — Palindrome check
+- `10_Pallindrome.js` — Palindrome check
 - `11_PrimeNum.js` — Prime number checker
 - `12_VowelConst_Array.js` — Vowel and consonant counter
 - `13_Pyramid.js` — Pyramid star pattern
 - `14_LeftTriangle.js` — Left-aligned triangle pattern
 - `15_RightTriangle.js` — Right-aligned triangle pattern
 - `16_LeapYear.js` — Leap year checker
+- `17_Duplicate_Array.js` — Find duplicate elements in an array
+- `18_Smallest_Array.js` — Find the smallest number in an array
+- `19_Sum_Array.js` — Sum of array elements
 
 ### IQ_Notes
 Conceptual notes and reference material:
@@ -128,6 +131,19 @@ Strings in JavaScript — covers:
 - String conversion (`String()`) and multiline strings
 - String properties and access (`length`, indexing, `at()`, `charAt()`, `charCodeAt()`)
 - String searching (`includes`, `startsWith`, `endsWith`, `indexOf`, `lastIndexOf`)
+- String extraction (`slice`, `substring`)
+- Case conversion, trimming, `replace`/`replaceAll`, concatenation
+- Splitting and joining strings, `parseInt`/`parseFloat` conversion
+- String immutability
+
+### 14_chapter_Object
+Objects in JavaScript — covers:
+- Object creation and JSON-style syntax
+- Accessing, adding, and modifying properties
+- Reference vs value semantics (call by reference / call by value)
+- Objects and references (assignment copies reference, not value)
+- Object methods (`this`)
+- Config-style object usage (adding, updating, deleting properties)
 
 ### PlayWright
 Playwright and automation-related material:
