@@ -6,14 +6,14 @@ var _a = 11;
 var pp = 12;
 
 var abc123 = 13;
-//var 45 = 46;
+//var 45 = 46; x
 
 var _ = 14;
 
 var Name = "Rohit";
 var name = "rawat";
 
-//var tom jerry = "cartoon";
+//var tom jerry = "cartoon"; x
 var tom_jerry ="cartoon";
 var tom$jerry = "cartoon";
 var tom123 = "cartoon";

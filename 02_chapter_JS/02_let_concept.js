@@ -6,6 +6,7 @@ for(let a =0; a < 100000; a++){
     badcode();
 }
 
-function badcode(){
+function badcode()
+{
     console.log("Hello ")
 }
