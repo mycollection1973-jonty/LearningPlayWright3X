@@ -2,12 +2,12 @@
 
 let fruit = [];
 let browsers = ["chrome", "firefox", "edge"];
-console.log(typeof browsers);
+console.log(typeof browsers); //object
 
 console.log(browsers[0]);  // chrome
 console.log(browsers.at(-1));  // edge
 console.log(browsers.length); // 3
-console.log(fruit.length);
+console.log(fruit.length);   // 0
 
 // For the Negative indexed, use the at
 console.log(browsers[-1]);   // undefined

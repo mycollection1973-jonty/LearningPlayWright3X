@@ -5,8 +5,8 @@
 
 let original = [1,2,3];
 let copy1 = [...original];
-// console.log(original);  // [ 1, 2, 3 ]
-// console.log(copy1);     // [ 1, 2, 3 ]
+console.log(original);  // [ 1, 2, 3 ]
+console.log(copy1);     // [ 1, 2, 3 ]
 
 let copy2 = original.slice();
 console.log(copy2);  // [ 1, 2, 3 ]

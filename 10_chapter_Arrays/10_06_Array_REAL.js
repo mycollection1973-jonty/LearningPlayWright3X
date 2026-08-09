@@ -3,12 +3,12 @@
 let browser = ["chrome","firefox","safari","opera","edge"];
 console.log(browser.length); //5
 
-browser.pop();
+browser.pop();  // will remove edge
 //console.log(browser);  // [ 'chrome', 'firefox', 'safari', 'opera' ]
 
-let removed = browser.shift();
+let removed = browser.shift(); // will removed chrome
 // console.log(browser);  //[ 'firefox', 'safari', 'opera', 'edge' ]
-// console.log(removed);  // chrome
+ console.log(removed);  // chrome
 
 for(  let i=0;i<browser.length;i++)
 {
