@@ -11,9 +11,9 @@
 
 // > , < , >= , <= 
 
-// console.log(3 > 4);
-// console.log(3 < 4);
-// console.log(4 >= 4); // (4 > 4 or 4 == 4, or gate)
+// console.log(3 > 4);  // false
+// console.log(3 < 4);  // true
+// console.log(4 >= 4); // (4 > 4 or 4 == 4, or gate)  true
 
 // console.log(5 == "5"); // lose couple comparsion , value
 // console.log(5 === "5"); // stict not allowed - valeu + datatype both
@@ -29,6 +29,6 @@ console.log(5 != "5"); // lose -> datatype or value //false
 console.log(5 !== "5"); // true
 // console.log(5 !=== "5"); This doesn't
 
-console.log(5 === 5);
-console.log(5 === '5');
-console.log('5'+3);
+console.log(5 === 5);  // true
+console.log(5 === '5');  // false
+console.log('5'+3);  53
