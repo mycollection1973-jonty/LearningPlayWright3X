@@ -13,19 +13,19 @@
  
 // Decimal (Base 10) - most common
 let decimal = 42;
-console.log("Decimal : ", decimal)
+console.log("Decimal : ", decimal)   // Decimal : 42
 
 // Binary (Base 2) - starts with 0b or 0B
 let binary = 0b1010;  // 10 in decimal
-console.log("Binary 0b1010 : ", binary);
+console.log("Binary 0b1010 : ", binary);  // Binary 0b1010 : 10
 
 // Octal (Base 8) - starts with 0o or 0O
 let octal = 0o52 // 42 in decimal
-console.log("OCtal 0o52 : ", octal);
+console.log("OCtal 0o52 : ", octal);   // Octal 0o52 : 42
 
 // Hexadecimal (Base 16) - starts with 0x or 0X
 let hex = 0x2A; // 42 in decimal
-console.log("Hexadecimal 0x2A : ", hex);
+console.log("Hexadecimal 0x2A : ", hex);  // Hexadecimal 0x2A : 42
 
 // --------------------------------------------------------
 // 2. FLOATING-POINT LITERALS
@@ -36,10 +36,10 @@ let float2 = -0.5;
 let float3 = .5;    // valid, but avoid for readability
 let float4 = 5.;    // valid, but avoid for readability
 
-console.log("Float 3.14 : ", float1);
-console.log("Float -0.5 : ", float2);
-console.log("Float .5 : ", float3);
-console.log("Float 5. : ", float4);
+console.log("Float 3.14 : ", float1);  // Float 3.14 :  3.14
+console.log("Float -0.5 : ", float2);  // Float -0.5 :  -0.5
+console.log("Float .5 : ", float3);    // Float .5 :  0.5
+console.log("Float 5. : ", float4);    // Float 5. :  5
 
 // Exponential notation
 let exp1 = 1.5e3;   // 1.5 * 10^3 = 1500

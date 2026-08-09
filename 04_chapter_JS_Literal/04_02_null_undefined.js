@@ -16,15 +16,15 @@
 // console.log(x);
 
 // var phone = null;
-// console.log(phone);
+// console.log(phone);  // null
 
 // --------------------------------------------------------
 // 1. undefined
 // --------------------------------------------------------
 
 let userName; //declared but not assigned
-console.log(userName);
-console.log(typeof username)
+console.log(userName);   // undefined
+console.log(typeof username);   // undefined
 
 // function greet() {
 //     // no return statement
@@ -33,14 +33,14 @@ console.log(typeof username)
 
 let x;
 x=11;
-console.log(x);
+console.log(x);  // 11
 
 // --------------------------------------------------------
 // 2. null
 // --------------------------------------------------------
 
 let profilePicture = null;
-console.log(profilePicture);
+console.log(profilePicture);   // null
 console.log(typeof profilePicture); // "object"  --> known JS quirk
 
 // --------------------------------------------------------

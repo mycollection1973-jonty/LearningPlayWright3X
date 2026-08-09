@@ -19,10 +19,10 @@ let big = 123456789012345678901234567890n;
 let big2 = BigInt("123456789012345678901234567890");
 let bigFromNum = BigInt(42);
 
-console.log("BigInt literal:", big);
-console.log("BigInt from string:", big2);
-console.log("BigInt from number:", bigFromNum);
-console.log("typeof BigInt:", typeof big); // "bigint"
+console.log("BigInt literal:", big);  // BigInt literal: 123456789012345678901234567890n
+console.log("BigInt from string:", big2);  // BigInt from string: 123456789012345678901234567890n
+console.log("BigInt from number:", bigFromNum);  // BigInt from number: 42n
+console.log("typeof BigInt:", typeof big); // bigint
 
 
 // --------------------------------------------------------
@@ -33,13 +33,13 @@ console.log("typeof BigInt:", typeof big); // "bigint"
 console.log("Infinity:", Infinity);           // Infinity
 console.log("1 / 0:", 1 / 0);                 // Infinity
 console.log("-1 / 0:", -1 / 0);               // -Infinity
-console.log("typeof Infinity:", typeof Infinity); // "number"
+console.log("typeof Infinity:", typeof Infinity); // number
 
 // -Infinity
-console.log("-Infinity:", -Infinity);
+console.log("-Infinity:", -Infinity);  // -Infinity
 
 // NaN (Not a Number) - result of invalid math
 console.log("NaN:", NaN);                     // NaN
 console.log("0 / 0:", 0 / 0);                 // NaN
 console.log("'hello' * 2:", "hello" * 2);     // NaN
-console.log("typeof NaN:", typeof NaN);       // "number" (quirky!)
+console.log("typeof NaN:", typeof NaN);       // number (quirky!)

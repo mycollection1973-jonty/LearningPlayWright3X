@@ -11,11 +11,12 @@ let pi2 = 3; // numeric literal
 // 2. float
 
 // typeof - operatr - It will tell you what is a data type that it has. 
-console.log(typeof age);
-console.log(typeof pi);
-console.log(typeof pi2);
-console.log(typeof isStudent);
-console.log(typeof nullValue);
-console.log(typeof undefinedvalue);
+console.log(typeof age);  // string
+console.log(typeof pi);  // number
+console.log(typeof pi2);  // number
+console.log(typeof isStudent); //  boolean
+console.log(typeof nullValue);  // object
+console.log(typeof undefinedvalue);  // undefined
+console.log(undefinedvalue);  // undefined
 
 // null typeof will be object
