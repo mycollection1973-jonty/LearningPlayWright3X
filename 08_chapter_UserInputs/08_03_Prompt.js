@@ -1,3 +1,5 @@
+// 21-07-2026
+
 const prompt = require("prompt-sync")();
 let num = Number(prompt("Enter a number: "));
 if (num % 2 === 0) {

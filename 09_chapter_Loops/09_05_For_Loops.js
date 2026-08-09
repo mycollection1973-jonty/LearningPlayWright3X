@@ -2,7 +2,7 @@
 
 // for (let _1=0; _1<=10;_1++)
 // {
-//     console.log(_1);
+//     console.log(_1);  // 0 1 2 3 4 5 6 7 8 9 10
 // }
 
 // for (let tim=0 ; tim>1;tim++)

@@ -9,6 +9,6 @@
 
 let a =10;
 do{
-    console.log(a);
+    console.log(a);  // 10
     a++;
 }while(a<10);
