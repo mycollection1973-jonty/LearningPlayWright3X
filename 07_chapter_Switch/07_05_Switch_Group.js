@@ -1,4 +1,4 @@
-let browser = "Edge";
+let browser = "Edge";  // Chromium Project
 
 switch(browser)
 {

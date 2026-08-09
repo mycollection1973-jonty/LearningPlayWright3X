@@ -1,4 +1,4 @@
-let day = 2;
+let day = 2;  // after case 2 all print because of no break
 switch (day)
 {
     case 0 :

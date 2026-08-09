@@ -1,5 +1,5 @@
 let status = 0;
-console.log(typeof status)
+console.log(typeof status)  //number
 
 switch(status) 
 {

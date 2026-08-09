@@ -1,4 +1,4 @@
-let day = 2;
+let day = 2; // case 2 will be O/P
 
 switch(day)
 {

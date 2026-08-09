@@ -1,4 +1,4 @@
-let fruit = "banana";
+let fruit = "banana";  // no break
 
 switch(fruit)
 {

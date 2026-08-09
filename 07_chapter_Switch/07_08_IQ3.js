@@ -1,4 +1,4 @@
-let x = 10;
+let x = 10;   // b1 will be executed
 switch(x)
 {
     case 10 :
