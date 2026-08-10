@@ -8,4 +8,4 @@ function greet (name)
 let op = greet("Jenny");
 console.log(op);  // Hello. Jenny
 
-//console.log(greet("Hay"));
+console.log(greet("Hay")); // Hello. Hay

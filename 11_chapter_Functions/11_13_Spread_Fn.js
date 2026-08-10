@@ -17,3 +17,4 @@ function hasError(...codes)
 let responseCodes = [200, 201, 404];
 let responseCodes2 = [200, 201, 400, 500];
 console.log(hasError(...responseCodes)); // true
+console.log(hasError(...responseCodes2)); // true

@@ -9,6 +9,6 @@ function sayHello(name)
 
 //Called
 
-sayHello("Rohit");
-sayHello("Harry");
-sayHello("Michael");
+sayHello("Rohit");  // Rohit 
+sayHello("Harry");  // Harry
+sayHello("Michael");// Michael

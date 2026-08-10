@@ -7,9 +7,9 @@ console.log(username);
 // ReferenceError: Cannot access 'username' before initialization
 // not allowed hoisting in let
 
-console.log(username);
-const username = "Mike";
-console.log(username);
+console.log(username1);
+const username1 = "Charlie";
+console.log(username1);
 
 // ReferenceError: Cannot access 'username' before initialization
 // not allowed hoisting in const
