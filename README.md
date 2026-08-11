@@ -145,6 +145,14 @@ Objects in JavaScript — covers:
 - Object methods (`this`)
 - Config-style object usage (adding, updating, deleting properties)
 
+### 15_Multi_Dimensions_Array
+Multi-dimensional arrays in JavaScript — covers:
+- 1D and 2D arrays (matrix / grid)
+- Accessing and modifying elements (`grid[i][j]`)
+- Iterating 2D arrays (nested `for`, `for...of`, `forEach`)
+- Array methods on 2D arrays (`map` + `reduce`)
+- Star pattern programs (right, left, pyramid)
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
