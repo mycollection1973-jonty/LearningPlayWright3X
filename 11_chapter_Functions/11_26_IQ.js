@@ -2,7 +2,7 @@
 
 greet("Andrew");
 
-function greet(name)    // not good use
+function greet(name)    // not good practice
 {
     console.log("Hi");  // Hi
     return `Hello, ${name}!`;

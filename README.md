@@ -153,6 +153,29 @@ Multi-dimensional arrays in JavaScript — covers:
 - Array methods on 2D arrays (`map` + `reduce`)
 - Star pattern programs (right, left, pyramid)
 
+### 16_Callback
+Callbacks in JavaScript — covers:
+- Callback basics (named, anonymous, arrow functions)
+- Sync vs async callbacks (`forEach`, `setTimeout`)
+- Callback hell (nested callbacks)
+- Real-world QA scenario (E2E login flow)
+- Returning values via callbacks
+- Pyramid of doom / DOM step sequencing
+
+### 17_Promise
+Promises in JavaScript — covers:
+- Promise basics (`resolve` / `reject`)
+- `.then()` and `.catch()` handling
+- `.finally()` — always executed
+- Real-world API and E2E login flows
+- `Promise.all`, `Promise.race`, `Promise.allSettled`
+- IQ questions and interview-style examples
+
+### 18_Async_Await
+Async/await in JavaScript — covers:
+- Async/await basics
+- The better way to write asynchronous code (vs promise chains)
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
