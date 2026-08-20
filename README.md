@@ -53,6 +53,19 @@ Practice coding exercises — includes:
 - `18_Smallest_Array.js` — Find the smallest number in an array
 - `19_Sum_Array.js` — Sum of array elements
 
+### Test_208
+Practice questions (Test 208) — includes:
+- `q1_EvenOdd.js` — Even or odd number check
+- `q2_LargestNumber.js` — Largest of 3 numbers
+- `q3_ReverseString.js` — Reverse a string
+- `q4_PallindromeString.js` — Palindrome string check
+- `q5_Factorial.js` — Factorial of a number
+- `q6_Fibonacci.js` — Fibonacci series up to N terms
+- `q7_PrimeNumber.js` — Prime number check
+- `q8_CountVowels.js` — Count vowels in a string
+- `q9_LargestNumberArray.js` — Largest number in an array
+- `q10_RemoveDuplicateArray.js` — Remove duplicate values from an array
+
 ### IQ_Notes
 Conceptual notes and reference material:
 - Identifier rules
