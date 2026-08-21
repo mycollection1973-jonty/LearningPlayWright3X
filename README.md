@@ -64,7 +64,7 @@ Practice questions (Test 208) — includes:
 - `q7_PrimeNumber.js` — Prime number check
 - `q8_CountVowels.js` — Count vowels in a string
 - `q9_LargestNumberArray.js` — Largest number in an array
-- `q10_RemoveDuplicateArray.js` — Remove duplicate values from an array
+- `q10_RemoveDuplicateArray.js` — Remove duplicate values from an array using nested loops
 
 ### IQ_Notes
 Conceptual notes and reference material:
