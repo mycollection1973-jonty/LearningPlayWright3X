@@ -186,8 +186,15 @@ Promises in JavaScript — covers:
 
 ### 18_Async_Await
 Async/await in JavaScript — covers:
-- Async/await basics
-- The better way to write asynchronous code (vs promise chains)
+- `18_01_Example.js` — Async/await basics
+- `18_02_BetterWay.js` — The better way to write asynchronous code (vs promise chains)
+- `18_03_Async_Await.js` — Async functions returning promises and `await` reading resolved values
+- `18_04_Example_Specs.ts` — Playwright test example using `await` (commented reference)
+- `18_05_TryCatch.js` — Error handling with `try`/`catch`/`finally` (vs `.catch()`)
+- `18_06_Sequence_Execution.js` — Sequential execution for dependent steps
+- `18_07_Parallel_Execution.js` — Parallel execution with `Promise.all`
+- `18_08_API_Flaky.js` — Retry pattern for flaky APIs (real QA scenario)
+- `18_09_IQ.js` — IQ and interview-style questions on async/await
 
 ### PlayWright
 Playwright and automation-related material:

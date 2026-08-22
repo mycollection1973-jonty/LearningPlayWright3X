@@ -15,5 +15,5 @@ function startBrowser()
 const runTc = startBrowser();
 runTc();
 
-installBrowser();  // installBrowser is not defined  
+//installBrowser();  // installBrowser is not defined  
 // inner function not allowed to call outside

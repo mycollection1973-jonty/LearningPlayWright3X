@@ -2,7 +2,7 @@
 
 function test(test, callMewhenDone)
 {
-    console.log("Hi Start the Test Case");4
+    console.log("Hi Start the Test Case");
     callMewhenDone();
 }
 

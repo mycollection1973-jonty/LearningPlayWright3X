@@ -38,6 +38,7 @@ async function runLoginFlow(){
     console.log("Step 4:", msg4);
 }
 
+runLoginFlow();
 // openBrowser()
 //     .then(function (msg) {
 //         console.log("Step 1", msg);
@@ -55,3 +56,16 @@ async function runLoginFlow(){
 //     }).finally(function () {
 //         console.log("Done execution!");
 //     });
+
+function apiRequest(){
+    return new Promise(function(resolve){
+        resolve({status:200});
+    });
+}
+
+async function runApiRequest(){
+    let response = await apiRequest();
+    console.log("API status: ", response.status);
+}
+
+runApiRequest();  // API status: 200
