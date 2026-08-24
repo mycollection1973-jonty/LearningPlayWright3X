@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>new Promise — Full Research Notes</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #273449;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #f87171;
+        --blue: #38bdf8;
+        --red: #f87171;
+        --yellow: #facc15;
+        --green: #4ade80;
+        --purple: #c084fc;
+        --code-bg: #0b1220;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.65;
+        padding: 2rem 1rem;
+    }
+    .wrap { max-width: 950px; margin: 0 auto; }
+    header.hero {
+        background: linear-gradient(135deg, #ef4444, #a855f7);
+        border-radius: 14px;
+        padding: 2.2rem 2rem;
+        margin-bottom: 2rem;
+    }
+    header.hero h1 { font-size: 2rem; color: #fff; margin-bottom: .4rem; }
+    header.hero p { color: #fef2f2; font-size: 1.05rem; }
+    .badge {
+        display: inline-block; background: rgba(255,255,255,.18);
+        padding: .15rem .6rem; border-radius: 20px; font-size: .8rem;
+        color: #fff; margin-top: .6rem;
+    }
+    h2 {
+        color: var(--accent); font-size: 1.35rem;
+        margin: 2.4rem 0 1rem; padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+    }
+    h3 { color: var(--blue); margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+    p, li { color: var(--text); }
+    .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0;
+    }
+    .note {
+        border-left: 4px solid var(--yellow); background: rgba(250,204,21,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .warn {
+        border-left: 4px solid var(--red); background: rgba(248,113,113,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .tip {
+        border-left: 4px solid var(--green); background: rgba(74,222,128,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+        font-size: .92rem; background: var(--panel); border-radius: 10px; overflow: hidden;
+    }
+    th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--panel2); color: var(--accent); }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+        font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    p code, li code { background: var(--panel2); padding: .1rem .4rem; border-radius: 5px; font-size: .88em; color: var(--yellow); }
+    pre {
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto;
+        font-size: .88rem; line-height: 1.55; margin: .8rem 0;
+    }
+    pre .kw { color: var(--accent); }
+    pre .fn { color: var(--yellow); }
+    pre .str { color: var(--green); }
+    pre .cm { color: var(--muted); font-style: italic; }
+    pre .num { color: var(--blue); }
+    .run-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .run-row button {
+        background: var(--accent); color: #2a0606; border: none; cursor: pointer;
+        padding: .45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: .88rem;
+    }
+    .run-row button:hover { filter: brightness(1.15); }
+    #output {
+        background: #062033; border: 1px solid var(--border); border-radius: 8px;
+        padding: .8rem 1rem; font-family: inherit; font-size: .9rem;
+        white-space: pre-wrap; min-height: 2.2rem; display: none; margin: .6rem 0;
+    }
+    #output .ok { color: var(--green); }
+    #output .err { color: var(--red); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+    .faq dt { font-weight: 700; color: var(--accent); margin-top: 1rem; }
+    .faq dd { margin-left: 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+    <h1><code>new Promise()</code> — Full Research</h1>
+    <p>A complete reference on the Promise constructor: the executor, resolve/reject, promise states, converting callback APIs, and QA/Playwright usage.</p>
+    <span class="badge">JavaScript · ECMAScript 2015 (ES6) · Baseline: July 2015</span>
+</header>
+
+<!-- ============ 1. WHAT IS new Promise ============ -->
+<h2>1. What is <code>new Promise()</code>?</h2>
+<p>
+    The <code>Promise()</code> constructor creates a new
+    <a href="#states">promise object</a>. Its main purpose is to
+    <strong>wrap callback-based APIs</strong> that don't already return promises, converting
+    them into modern, chainable, <code>await</code>-able code.
+</p>
+<ul>
+    <li>It must be called with <code>new</code> — calling <code>Promise()</code> without <code>new</code> throws a <code>TypeError</code>.</li>
+    <li>It accepts one function — the <code>executor</code> — which receives <code>resolve</code> and <code>reject</code>.</li>
+    <li>The <strong>executor runs synchronously</strong>, immediately at construction time.</li>
+    <li>If your task is already promise-based, you probably don't need this constructor at all — use <code>Promise.resolve()</code> or an <code>async</code> function instead.</li>
+</ul>
+
+<!-- ============ 2. SYNTAX ============ -->
+<h2>2. Syntax</h2>
+<pre><code><span class="kw">new</span> Promise(executor)
+
+<span class="kw">function</span> <span class="fn">executor</span>(resolveFunc, rejectFunc) {
+    <span class="cm">// some async operation that accepts a callback…</span>
+    <span class="cm">// then call resolveFunc(value) on success</span>
+    <span class="cm">//     or rejectFunc(reason) on failure</span>
+}</code></pre>
+<table>
+    <tr><th>Part</th><th>Meaning</th></tr>
+    <tr><td><code>executor</code></td><td>A function run immediately by the constructor. Its return value is ignored; only calls to <code>resolve</code>/<code>reject</code> (or a thrown error) affect the promise.</td></tr>
+    <tr><td><code>resolveFunc(value)</code></td><td>Fulfills the promise with <code>value</code> (or locks into a thenable / promise passed to it).</td></tr>
+    <tr><td><code>rejectFunc(reason)</code></td><td>Rejects the promise with <code>reason</code> — same effect as <code>throw</code> in a try/catch sense.</td></tr>
+    <tr><td>Return value</td><td>The new promise object (pending until resolved or rejected).</td></tr>
+</table>
+
+<!-- ============ 3. THE THREE STATES ============ -->
+<h2 id="states">3. Promise states — pending, fulfilled, rejected</h2>
+<table>
+    <tr><th>State</th><th>Meaning</th><th>Handlers that fire</th></tr>
+    <tr><td><code>pending</code></td><td>Neither settled nor rejected — the operation is still running.</td><td>none (yet)</td></tr>
+    <tr><td><code>fulfilled</code></td><td>The operation succeeded — <code>resolve(value)</code> was called with a non-thenable value.</td><td><code>.then(onFulfilled)</code>, <code>await</code></td></tr>
+    <tr><td><code>rejected</code></td><td>The operation failed — <code>reject(reason)</code> was called or the executor threw.</td><td><code>.catch()</code>, <code>try/catch</code> around <code>await</code></td></tr>
+</table>
+
+<div class="note">
+    <strong>Resolved vs settled — don't confuse them:</strong> a promise can be <em>resolved</em>
+    (someone called <code>resolve()</code>) but still be <em>pending</em> — exactly when it's
+    resolved with <em>another promise</em> or thenable. The promise "locks into" that inner value
+    and only settles when the inner one settles. Settled = fulfilled <em>or</em> rejected.
+</div>
+
+<!-- ============ 4. THE EXECUTOR RULES ============ -->
+<h2>4. Executor rules — what actually happens</h2>
+<ul>
+    <li><strong>Runs immediately and synchronously</strong> with <code>resolve</code> and <code>reject</code> already "tethered" to the promise.</li>
+    <li><strong>Return value is ignored.</strong> <code>return "x"</code> doesn't fulfill the promise — only calling <code>resolve("x")</code> does.</li>
+    <li><strong>Throwing rejects</strong> — an uncaught error in the executor rejects the promise… unless <code>resolve</code>/<code>reject</code> already fired (then the throw is ignored).</li>
+    <li><strong>First call wins.</strong> Only the first <code>resolve()</code> or <code>reject()</code> matters; later calls can never change the outcome.</li>
+    <li><strong>If neither is ever called</strong> → the promise stays pending forever. (Note: pending promises don't prevent the program from exiting when the event loop is empty.)</li>
+</ul>
+
+<div class="card">
+    <h3>Live example 1 — fulfill, reject, and first-call-wins</h3>
+    <pre id="code1"><code><span class="cm">// 1. fulfill with a value</span>
+<span class="kw">const</span> p1 = <span class="kw">new</span> Promise(resolve =&gt; resolve(<span class="str">"foo"</span>));
+p1.then(v =&gt; console.log(v));          <span class="cm">// foo</span>
+
+<span class="cm">// 2. reject with an error</span>
+<span class="kw">const</span> p2 = <span class="kw">new</span> Promise((resolve, reject) =&gt;
+    reject(<span class="kw">new</span> Error(<span class="str">"Test failed"</span>)));
+p2.catch(err =&gt; console.log(err.message));   <span class="cm">// Test failed</span>
+
+<span class="cm">// 3. throwing in the executor = calling reject()</span>
+<span class="kw">const</span> p3 = <span class="kw">new</span> Promise(() =&gt; { <span class="kw">throw new</span> Error(<span class="str">"boom"</span>); });
+p3.catch(err =&gt; console.log(err.message));   <span class="cm">// boom</span>
+
+<span class="cm">// 4. only the FIRST resolve/reject wins</span>
+<span class="kw">const</span> p4 = <span class="kw">new</span> Promise((resolve, reject) =&gt; {
+    resolve(<span class="str">"first"</span>);
+    reject(<span class="kw">new</span> Error(<span class="str">"too late"</span>));   <span class="cm">// ignored</span>
+    resolve(<span class="str">"again"</span>);                    <span class="cm">// ignored</span>
+});
+p4.then(v =&gt; console.log(v));          <span class="cm">// first</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code1','out1')">▶ Run example</button>
+    </div>
+    <div id="out1"></div>
+</div>
+
+<div class="card">
+    <h3>Live example 2 — the executor runs synchronously</h3>
+    <pre id="code2"><code>console.log(<span class="str">"before"</span>);
+
+<span class="kw">const</span> p = <span class="kw">new</span> Promise((resolve) =&gt; {
+    console.log(<span class="str">"executor runs at construction"</span>);
+    queueMicrotask(() =&gt; resolve(<span class="str">"done"</span>));
+});
+
+console.log(<span class="str">"after"</span>);
+p.then(v =&gt; console.log(v));
+
+<span class="cm">// before</span>
+<span class="cm">// executor runs at construction</span>
+<span class="cm">// after</span>
+<span class="cm">// done</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code2','out2')">▶ Run example</button>
+    </div>
+    <div id="out2"></div>
+</div>
+
+<!-- ============ 5. RESOLVING WITH ANOTHER PROMISE ============ -->
+<h2>5. Resolving with a promise / thenable (flattening)</h2>
+<p>
+    <code>resolve(somePromise)</code> doesn't copy the value — it <strong>locks your promise
+    into</strong> that inner promise. Handlers you attach later wait for the inner one, and
+    nested thenables get flattened automatically:
+</p>
+<pre><code><span class="kw">const</span> outer = <span class="kw">new</span> Promise(resolve =&gt; {
+    resolve(<span class="kw">new</span> Promise(res =&gt; res(<span class="str">"inner value"</span>)));
+});
+
+outer.then(v =&gt; console.log(v));   <span class="cm">// inner value — no extra .then() needed</span></code></pre>
+<p>Equivalent to ~</p>
+<pre><code><span class="kw">new</span> Promise((resolve, reject) =&gt; {
+    <span class="kw">try</span> {
+        thenable.then(v =&gt; resolve(v), r =&gt; reject(r));
+    } <span class="kw">catch</span> (e) {
+        reject(e);
+    }
+});</code></pre>
+
+<div class="warn">
+    <strong>Danger — resolving with the promise itself:</strong>
+    <code>resolve(itself)</code> causes a
+    <code>TypeError: Chaining cycle detected for promise</code> (a cycle can never settle).
+    Avoid patterns where the resolve value is the same promise you're creating.
+</div>
+
+<!-- ============ 6. THE FLAGSHIP USE CASE ============ -->
+<h2>6. Converting a callback API into a promise API</h2>
+<p>
+    The single most important reason to use <code>new Promise()</code>. Given a classic
+    callback-style API:
+</p>
+<pre><code>readConfig(<span class="str">"./config.json"</span>, (error, result) =&gt; {
+    <span class="cm">// everything that depends on the file must live in here</span>
+    <span class="kw">if</span> (error) reject(error);
+    <span class="kw">else</span> console.log(result);
+});
+<span class="cm">// code after this line runs immediately — it can't see `result`</span></code></pre>
+<p>Wrap it once, and callers get a clean promise:</p>
+<pre><code><span class="kw">function</span> <span class="fn">readConfigPromise</span>() {
+    <span class="kw">return new</span> Promise((resolve, reject) =&gt; {
+        readConfig((error, result) =&gt; {
+            <span class="kw">if</span> (error) reject(error);
+            <span class="kw">else</span> resolve(result);
+        });
+    });
+}
+
+<span class="kw">await</span> readConfigPromise();   <span class="cm">// readable, throwable, chainable</span></code></pre>
+
+<div class="card">
+    <h3>Live example 3 — wrap a simulated callback API</h3>
+    <pre id="code3"><code><span class="cm">// A legacy, callback-based function (no promise support)</span>
+<span class="kw">function</span> <span class="fn">lookupUser</span>(id, callback) {
+    <span class="cm">// async work that reports back via callback(err, user)</span>
+    queueMicrotask(() =&gt; {
+        <span class="kw">if</span> (id &lt; <span class="num">0</span>) callback(<span class="kw">new</span> Error(<span class="str">"invalid id"</span>));
+        <span class="kw">else</span> callback(<span class="kw">null</span>, { id, name: <span class="str">"QA User"</span> });
+    });
+}
+
+<span class="cm">// Promise wrapper — the executor bridges callback → resolve/reject</span>
+<span class="kw">function</span> <span class="fn">lookupUserAsync</span>(id) {
+    <span class="kw">return new</span> Promise((resolve, reject) =&gt; {
+        lookupUser(id, (error, user) =&gt; {
+            <span class="kw">if</span> (error) reject(error);
+            <span class="kw">else</span> resolve(user);
+        });
+    });
+}
+
+lookupUserAsync(<span class="num">42</span>)
+    .then(user =&gt; console.log(user.id, user.name))          <span class="cm">// 42 QA User</span>
+    .catch(err =&gt; console.log(<span class="str">"Failed:"</span>, err.message));
+
+lookupUserAsync(-<span class="num">1</span>)
+    .then(user =&gt; console.log(user))
+    .catch(err =&gt; console.log(<span class="str">"Failed:"</span>, err.message));  <span class="cm">// Failed: invalid id</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code3','out3')">▶ Run example</button>
+    </div>
+    <div id="out3"></div>
+</div>
+
+<!-- ============ 7. WHEN TO USE IT ============ -->
+<h2>7. <code>new Promise</code> vs the alternatives</h2>
+<table>
+    <tr><th>Tool</th><th>Use it when…</th><th>Example</th></tr>
+    <tr><td><code>new Promise(executor)</code></td><td>Wrapping a callback-based API (fs, old libraries, browser XHR)</td><td><code>readFile(path, cb)</code> → promise</td></tr>
+    <tr><td><code>Promise.resolve(value)</code></td><td>You already have a value / promise — just needs a promise shape</td><td><code>Promise.resolve(200)</code></td></tr>
+    <tr><td><code>async function</code></td><td>You control the code — simpler, auto-wraps the return</td><td><code>async () =&gt; 200</code></td></tr>
+    <tr><td><code>Promise.withResolvers()</code></td><td>You need <code>resolve</code>/<code>reject</code> outside the executor (e.g. decide resolution later)</td><td>deferred-style flows</td></tr>
+</table>
+
+<div class="tip">
+    <strong>Rule of thumb:</strong> if the code inside the executor doesn't use a callback-based
+    API, you probably shouldn't be using <code>new Promise</code>. Prefer an
+    <code>async</code> function or <code>Promise.resolve</code>/<code>reject</code>.
+</div>
+
+<!-- ============ 8. QA / PLAYWRIGHT ============ -->
+<h2>8. <code>new Promise</code> in QA &amp; Playwright</h2>
+<ul>
+    <li><strong>Promisify legacy helpers</strong> — wrap old Selenium-style or custom runner callbacks so tests can <code>await</code> them.</li>
+    <li><strong>Custom waits</strong> — build a promise that resolves when a condition is met and rejects on timeout:</li>
+</ul>
+<pre><code><span class="kw">function</span> <span class="fn">waitForCondition</span>(checkFn, timeoutMs = <span class="num">5000</span>) {
+    <span class="kw">return new</span> Promise((resolve, reject) =&gt; {
+        <span class="kw">const</span> start = Date.now();
+        (<span class="kw">function</span> poll() {
+            <span class="kw">if</span> (checkFn()) <span class="kw">return</span> resolve(<span class="str">"condition met"</span>);
+            <span class="kw">if</span> (Date.now() - start &gt; timeoutMs)
+                <span class="kw">return</span> reject(<span class="kw">new</span> Error(<span class="str">"timed out waiting"</span>));
+            setTimeout(poll, <span class="num">200</span>);
+        })();
+    });
+}
+
+<span class="kw">await</span> waitForCondition(() =&gt; page.getByText(<span class="str">"Loaded"</span>).isVisible());</code></pre>
+
+<!-- ============ 9. COMMON MISTAKES ============ -->
+<h2>9. Common mistakes &amp; interview traps</h2>
+<ul>
+    <li><strong>Forgetting <code>new</code></strong> → <code>Promise(...)</code> throws <code>TypeError: Constructor Promise requires 'new'</code>.</li>
+    <li><strong><code>return</code> instead of <code>resolve()</code></strong> → the return value is ignored; the promise stays pending forever.</li>
+    <li><strong>Never calling <code>resolve</code>/<code>reject</code></strong> → forever-pending promise; handlers never fire. (A pending promise doesn't block program exit, though.)</li>
+    <li><strong>Resolving with the promise itself</strong> → chaining-cycle <code>TypeError</code>.</li>
+    <li><strong>Calling <code>resolve</code> <em>and</em> <code>reject</code></strong> → first call wins; the rest are silent no-ops, so guard logic around "has it settled yet?" is unnecessary.</li>
+    <li><strong>Throwing after <code>resolve()</code></strong> → the throw is swallowed (promise already resolved).</li>
+    <li><strong>Using <code>new Promise</code> where <code>async</code>/<code>Promise.resolve</code> suffice</strong> → more code, more chances for a forever-pending bug.</li>
+</ul>
+
+<!-- ============ 10. IQ QUESTIONS ============ -->
+<h2>10. Quick IQ questions (with answers)</h2>
+<dl class="faq">
+    <dt>Q: When is the executor function called?</dt>
+    <dd>A: Immediately and synchronously when the promise is constructed — before the constructor even returns.</dd>
+
+    <dt>Q: Does <code>return "x"</code> inside the executor fulfill the promise?</dt>
+    <dd>A: No. The executor's return value is ignored; only calling <code>resolve("x")</code> fulfills it.</dd>
+
+    <dt>Q: What happens if the executor throws?</dt>
+    <dd>A: The promise rejects with the thrown error — unless <code>resolve</code>/<code>reject</code> were already called, in which case the throw is ignored.</dd>
+
+    <dt>Q: resolve(a) then reject(b) — what state?</dt>
+    <dd>A: Fulfilled with <code>a</code>. Only the first call affects the promise; every later call is ignored.</dd>
+
+    <dt>Q: What does <code>resolve(anotherPromise)</code> do?</dt>
+    <dd>A: It "locks in" your promise to anotherPromise — your promise stays pending until that inner promise settles, and adopts its result without extra <code>.then()</code>.</dd>
+
+    <dt>Q: Can I access <code>resolve</code>/<code>reject</code> after the constructor returns?</dt>
+    <dd>A: Not from the executor scope. Use <code>Promise.withResolvers()</code> if you need the resolving functions later.</dd>
+</dl>
+
+<!-- ============ 11. REFERENCES ============ -->
+<h2>11. References</h2>
+<ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise">MDN — Promise() constructor</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">MDN — Promise object</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers">MDN — Promise.withResolvers()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN — Using promises guide</a></li>
+    <li><a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise-constructor">ECMAScript 2027 spec — Promise constructor</a></li>
+</ul>
+
+<footer>
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 17 (Promise) · Date: 2026-08-21
+</footer>
+
+</div>
+
+<script>
+function runExample(codeId, outId) {
+    const codeEl = document.getElementById(codeId);
+    const outEl = document.getElementById(outId);
+    outEl.style.display = 'block';
+    outEl.innerHTML = '<span class="ok">Running…</span>';
+
+    // textContent decodes the HTML entities used by syntax highlighting
+    const raw = codeEl.textContent;
+
+    const logs = [];
+    const log = function (...args) {
+        logs.push(Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+    };
+
+    // Route console.log calls to our capture function (comments are unaffected)
+    const src = raw.replace(/console\.log\s*\(/g, 'logRaw(');
+
+    try {
+        const runner = new Function('logRaw', src + '\n');
+        runner(log);
+        // Async callbacks (microtasks) run after the runner returns — render once they've flushed
+        setTimeout(function () {
+            outEl.innerHTML = logs.length
+                ? logs.map(l => '<span class="ok">' + l.replace(/</g, '&lt;') + '</span>').join('\n')
+                : '<span class="ok">(no console output)</span>';
+        }, 150);
+    } catch (e) {
+        outEl.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+</script>
+</body>
+</html>

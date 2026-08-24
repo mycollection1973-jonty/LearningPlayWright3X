@@ -196,6 +196,15 @@ Async/await in JavaScript — covers:
 - `18_08_API_Flaky.js` — Retry pattern for flaky APIs (real QA scenario)
 - `18_09_IQ.js` — IQ and interview-style questions on async/await
 
+### Aysnc_Await_Notes
+Interactive HTML reference pages (dark theme, runnable "Run example" buttons) — covers:
+- `callback_research.html` — The callback pattern: sync vs async callbacks, error-first style, callback hell, and the evolution to promises
+- `async_keyword_research.html` — The `async` keyword: syntax forms, always-returns-a-promise rule, execution order, hoisting
+- `await_keyword_research.html` — The `await` operator: unwrapping promises, microtask control flow, rejection handling, top-level await
+- `new_promise_research.html` — The `Promise()` constructor: executor rules, resolve/reject, promise states, wrapping callback APIs
+- `promise_all_research.html` — `Promise.all()`: batching, input-order results, fail-fast behavior, parallel execution patterns
+- `promise_race_research.html` — `Promise.race()`: first-settled-wins, request timeouts, race vs any
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promise.race — Full Research Notes</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #273449;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #fbbf24;
+        --blue: #38bdf8;
+        --red: #f87171;
+        --yellow: #facc15;
+        --green: #4ade80;
+        --purple: #c084fc;
+        --code-bg: #0b1220;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.65;
+        padding: 2rem 1rem;
+    }
+    .wrap { max-width: 950px; margin: 0 auto; }
+    header.hero {
+        background: linear-gradient(135deg, #f59e0b, #f43f5e);
+        border-radius: 14px;
+        padding: 2.2rem 2rem;
+        margin-bottom: 2rem;
+    }
+    header.hero h1 { font-size: 2rem; color: #fff; margin-bottom: .4rem; }
+    header.hero p { color: #fff7ed; font-size: 1.05rem; }
+    .badge {
+        display: inline-block; background: rgba(255,255,255,.18);
+        padding: .15rem .6rem; border-radius: 20px; font-size: .8rem;
+        color: #fff; margin-top: .6rem;
+    }
+    h2 {
+        color: var(--accent); font-size: 1.35rem;
+        margin: 2.4rem 0 1rem; padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+    }
+    h3 { color: var(--blue); margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+    p, li { color: var(--text); }
+    .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0;
+    }
+    .note {
+        border-left: 4px solid var(--yellow); background: rgba(250,204,21,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .warn {
+        border-left: 4px solid var(--red); background: rgba(248,113,113,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .tip {
+        border-left: 4px solid var(--green); background: rgba(74,222,128,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+        font-size: .92rem; background: var(--panel); border-radius: 10px; overflow: hidden;
+    }
+    th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--panel2); color: var(--accent); }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+        font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    p code, li code { background: var(--panel2); padding: .1rem .4rem; border-radius: 5px; font-size: .88em; color: var(--yellow); }
+    pre {
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto;
+        font-size: .88rem; line-height: 1.55; margin: .8rem 0;
+    }
+    pre .kw { color: var(--accent); }
+    pre .fn { color: var(--yellow); }
+    pre .str { color: var(--green); }
+    pre .cm { color: var(--muted); font-style: italic; }
+    pre .num { color: var(--blue); }
+    .run-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .run-row button {
+        background: var(--accent); color: #2a1a00; border: none; cursor: pointer;
+        padding: .45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: .88rem;
+    }
+    .run-row button:hover { filter: brightness(1.15); }
+    #output {
+        background: #062033; border: 1px solid var(--border); border-radius: 8px;
+        padding: .8rem 1rem; font-family: inherit; font-size: .9rem;
+        white-space: pre-wrap; min-height: 2.2rem; display: none; margin: .6rem 0;
+    }
+    #output .ok { color: var(--green); }
+    #output .err { color: var(--red); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+    .faq dt { font-weight: 700; color: var(--accent); margin-top: 1rem; }
+    .faq dd { margin-left: 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+    <h1><code>Promise.race()</code> — Full Research</h1>
+    <p>A complete reference on the Promise.race static method: first-settled-wins semantics, the request-timeout pattern, race vs any, and QA/Playwright usage.</p>
+    <span class="badge">JavaScript · ECMAScript 2015 (ES6) · Baseline: July 2015</span>
+</header>
+
+<!-- ============ 1. WHAT IS Promise.race ============ -->
+<h2>1. What is <code>Promise.race()</code>?</h2>
+<p>
+    <code>Promise.race()</code> is a <strong>static method</strong> that takes an iterable of
+    promises and returns a single promise that settles with the <strong>eventual state of the
+    FIRST promise to settle</strong> — regardless of whether that state is fulfillment or rejection.
+</p>
+<ul>
+    <li><strong>First to settle wins.</strong> It doesn't matter if the winner fulfilled or rejected — its exact state is copied to the returned promise.</li>
+    <li>Every other promise is ignored after that (its result is discarded).</li>
+    <li>It's one of the four promise <em>concurrency</em> methods: <code>all</code>, <code>allSettled</code>, <code>any</code>, <code>race</code>.</li>
+</ul>
+
+<!-- ============ 2. SYNTAX ============ -->
+<h2>2. Syntax</h2>
+<pre><code>Promise.race(iterable)</code></pre>
+<table>
+    <tr><th>Part</th><th>Meaning</th></tr>
+    <tr><td><code>iterable</code></td><td>An iterable such as an array of promises (non-promise values allowed — see §4).</td></tr>
+    <tr><td>Return value</td><td>A promise that <strong>asynchronously settles</strong> with the first settled input's state.</td></tr>
+</table>
+
+<h3>Unique settle rules</h3>
+<table>
+    <tr><th>Input</th><th>Behavior</th></tr>
+    <tr><td>Empty iterable <code>Promise.race([])</code></td><td>Returns a promise that is <strong>forever pending</strong> — it never settles (unique among combinators!).</td></tr>
+    <tr><td>First settled promise fulfills</td><td>Returned promise fulfills with that value.</td></tr>
+    <tr><td>First settled promise rejects</td><td>Returned promise rejects with that reason.</td></tr>
+    <tr><td>Non-promise / already-settled values</td><td>The first such value found in the iterable wins the race immediately.</td></tr>
+</table>
+
+<div class="note">
+    <strong>Always asynchronous:</strong> unlike <code>Promise.all([])</code> (which is sync),
+    <code>Promise.race</code> never settles synchronously — even with all inputs already settled,
+    you first see it as <code>pending</code> and it settles one tick later.
+</div>
+
+<!-- ============ 3. LIVE EXAMPLES ============ -->
+<h2>3. Live examples — run them below</h2>
+<p style="color:var(--muted)">
+    The runnable examples simulate "slower / faster" with microtask rounds instead of
+    <code>setTimeout</code>, so they produce instant, deterministic output.
+</p>
+
+<div class="card">
+    <h3>Example 1 — the faster promise wins the race</h3>
+    <pre id="code1"><code><span class="kw">function</span> <span class="fn">timer</span>(name, rounds) {
+    <span class="kw">return new</span> Promise(res =&gt; {
+        <span class="kw">let</span> n = <span class="num">0</span>;
+        (<span class="kw">function</span> tick() {
+            n++;
+            <span class="kw">if</span> (n &gt;= rounds) res(name);
+            <span class="kw">else</span> queueMicrotask(tick);   <span class="cm">// 1 round = fast, more = slower</span>
+        })();
+    });
+}
+
+<span class="kw">const</span> fast  = timer(<span class="str">"two"</span>, <span class="num">1</span>);   <span class="cm">// settles after 1 round</span>
+<span class="kw">const</span> slow  = timer(<span class="str">"one"</span>, <span class="num">5</span>);   <span class="cm">// settles after 5 rounds</span>
+
+Promise.race([slow, fast]).then(value =&gt; {
+    console.log(value);   <span class="cm">// "two" — both fulfill, but fast is quicker</span>
+});
+<span class="cm">// two</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code1','out1')">▶ Run example</button>
+    </div>
+    <div id="out1"></div>
+</div>
+
+<div class="card">
+    <h3>Example 2 — rejection can win the race too</h3>
+    <pre id="code2"><code><span class="kw">const</span> fastReject = <span class="kw">new</span> Promise((res, rej) =&gt;
+    queueMicrotask(() =&gt; rej(<span class="kw">new</span> Error(<span class="str">"rejects first"</span>))));
+
+<span class="kw">const</span> slowFulfill = <span class="kw">new</span> Promise(res =&gt;
+    queueMicrotask(() =&gt; res(<span class="str">"fulfillment comes later"</span>)));
+
+Promise.race([fastReject, slowFulfill])
+    .then(v =&gt; console.log(<span class="str">"won:"</span>, v))
+    .catch(e =&gt; console.log(<span class="str">"won:"</span>, e.message));
+<span class="cm">// won: rejects first — race doesn't care about the outcome, only the speed</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code2','out2')">▶ Run example</button>
+    </div>
+    <div id="out2"></div>
+</div>
+
+<div class="card">
+    <h3>Example 3 — non-promise value wins instantly</h3>
+    <pre id="code3"><code><span class="kw">const</span> neverSettles = <span class="kw">new</span> Promise(() =&gt; {});   <span class="cm">// pending forever</span>
+
+Promise.race([neverSettles, <span class="str">"non-Promise value"</span>]).then(v =&gt; {
+    console.log(v);   <span class="cm">// the plain value is already "settled"</span>
+});
+<span class="cm">// non-Promise value</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code3','out3')">▶ Run example</button>
+    </div>
+    <div id="out3"></div>
+</div>
+
+<div class="card">
+    <h3>Example 4 — fastest endpoint of three wins</h3>
+    <pre id="code4"><code><span class="kw">function</span> <span class="fn">api</span>(name, rounds) {
+    <span class="kw">return new</span> Promise(res =&gt; {
+        <span class="kw">let</span> n = <span class="num">0</span>;
+        (<span class="kw">function</span> tick() {
+            n++;
+            <span class="kw">if</span> (n &gt;= rounds) res(name + <span class="str">": 200 OK"</span>);
+            <span class="kw">else</span> queueMicrotask(tick);
+        })();
+    });
+}
+
+(<span class="kw">async</span> () =&gt; {
+<span class="kw">const</span> winner = <span class="kw">await</span> Promise.race([
+    api(<span class="str">"CDN A"</span>, <span class="num">3</span>),
+    api(<span class="str">"CDN B"</span>, <span class="num">1</span>),   <span class="cm">// fastest — wins</span>
+    api(<span class="str">"CDN C"</span>, <span class="num">2</span>),
+]);
+
+console.log(winner);
+<span class="cm">// CDN B: 200 OK</span>
+})();</code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code4','out4')">▶ Run example</button>
+    </div>
+    <div id="out4"></div>
+</div>
+
+<!-- ============ 4. THE CLASSIC TIMEOUT PATTERN ============ -->
+<h2>4. The classic use case — request timeout</h2>
+<p>
+    Race a real request against a timer that rejects after the deadline. If the request
+    doesn't finish in time, the returned promise rejects with your timeout error:
+</p>
+<pre><code><span class="kw">const</span> data = Promise.race([
+    fetch(<span class="str">"/api"</span>),
+    <span class="kw">new</span> Promise((resolve, reject) =&gt; {
+        setTimeout(() =&gt; reject(<span class="kw">new</span> Error(<span class="str">"Request timed out"</span>)), <span class="num">5000</span>);
+    }),
+])
+.then(res =&gt; res.json())
+.catch(err =&gt; showError(err));</code></pre>
+<div class="tip">
+    No cleanup needed! If <code>fetch</code> wins, the timeout rejection is captured and
+    discarded by <code>Promise.race</code> — it will not bubble up as an unhandled rejection.
+</div>
+
+<!-- ============ 5. NON-PROMISE / SETTLED VALUES ============ -->
+<h2>5. Non-promise and already-settled values</h2>
+<p>
+    Values that are already settled (or non-promises, which count as settled) win immediately
+    when found — the <em>first</em> one in iterable order:
+</p>
+<pre><code><span class="kw">const</span> forever = Promise.race([]);                    <span class="cm">// pending forever</span>
+<span class="kw">const</span> settled = Promise.resolve(<span class="num">100</span>);
+
+Promise.race([forever, settled, <span class="str">"hello"</span>]).then(v =&gt; console.log(v));
+<span class="cm">// 100 — the first settled value found (settled comes before "hello")</span></code></pre>
+
+<!-- ============ 6. DETECTING PROMISE STATE ============ -->
+<h2>6. Clever trick — detect if a promise is pending</h2>
+<p>
+    Because a non-promise wins the race instantly, you can use it as a "pending" marker:
+</p>
+<pre><code><span class="kw">function</span> <span class="fn">promiseState</span>(promise) {
+    <span class="kw">const</span> pendingMarker = { status: <span class="str">"pending"</span> };
+    <span class="kw">return</span> Promise.race([promise, pendingMarker]).then(
+        value =&gt; value === pendingMarker ? value : { status: <span class="str">"fulfilled"</span>, value },
+        reason =&gt; ({ status: <span class="str">"rejected"</span>, reason }),
+    );
+}
+
+<span class="kw">async function</span> <span class="fn">inspect</span>(p) {
+    <span class="kw">const</span> state = <span class="kw">await</span> promiseState(p);   <span class="cm">// safe — called inside an async fn</span>
+    console.log(state);
+}
+<span class="cm">// { status: "pending" } | { status: "fulfilled", value } | { status: "rejected", reason }</span></code></pre>
+<div class="note">
+    This still runs asynchronously (there's no sync way to read a promise's value), but it
+    always fulfills within one tick and never actually waits for the promise to settle.
+</div>
+
+<!-- ============ 7. race vs any ============ -->
+<h2>7. <code>Promise.race</code> vs <code>Promise.any</code> — the critical difference</h2>
+<div class="grid2">
+<pre><code><span class="cm">// race — FIRST SETTLED wins (success or failure)</span>
+<span class="kw">const</span> p1 = <span class="kw">new</span> Promise(res =&gt;
+    setTimeout(() =&gt; res(<span class="str">"one"</span>), <span class="num">500</span>));
+<span class="kw">const</span> p2 = <span class="kw">new</span> Promise((res, rej) =&gt;
+    setTimeout(() =&gt; rej(<span class="str">"two"</span>), <span class="num">100</span>));
+
+Promise.race([p1, p2])
+    .then(v =&gt; console.log(<span class="str">"succeeded:"</span>, v))
+    .catch(e =&gt; console.error(<span class="str">"failed:"</span>, e));
+<span class="cm">// failed: two  ← rejection was faster</span></code></pre>
+<pre><code><span class="cm">// any — FIRST FULFILLMENT wins, ignores rejections</span>
+<span class="kw">const</span> p1 = <span class="kw">new</span> Promise(res =&gt;
+    setTimeout(() =&gt; res(<span class="str">"one"</span>), <span class="num">500</span>));
+<span class="kw">const</span> p2 = <span class="kw">new</span> Promise((res, rej) =&gt;
+    setTimeout(() =&gt; rej(<span class="str">"two"</span>), <span class="num">100</span>));
+
+Promise.any([p1, p2])
+    .then(v =&gt; console.log(<span class="str">"succeeded:"</span>, v))
+    .catch(e =&gt; console.error(<span class="str">"failed:"</span>, e));
+<span class="cm">// succeeded: one  ← rejections are skipped</span></code></pre>
+</div>
+<p>
+    Use <code>race</code> when the <em>first completion</em> matters (e.g. timeout detection).
+    Use <code>any</code> when the <em>first success</em> matters (e.g. redundant endpoints).
+</p>
+
+<!-- ============ 8. COMPARISON TABLE ============ -->
+<h2>8. Promise combinators compared</h2>
+<table>
+    <tr><th>Method</th><th>Settles when…</th><th>Empty iterable?</th><th>Best for</th></tr>
+    <tr><td><code>Promise.all</code></td><td>all fulfill — or the first rejection</td><td>fulfilled with <code>[]</code> (sync)</td><td>all tasks must succeed</td></tr>
+    <tr><td><code>Promise.allSettled</code></td><td>all settle — never rejects</td><td>fulfilled with <code>[]</code></td><td>collect every outcome</td></tr>
+    <tr><td><code>Promise.race</code></td><td>first promise settles (fulfill <em>or</em> reject)</td><td><strong>pending forever</strong></td><td>fastest completion wins / timeouts</td></tr>
+    <tr><td><code>Promise.any</code></td><td>first <em>fulfillment</em>; rejects if all reject</td><td>rejects with <code>AggregateError</code></td><td>first success wins</td></tr>
+</table>
+
+<!-- ============ 9. QA / PLAYWRIGHT ============ -->
+<h2>9. <code>Promise.race</code> in QA &amp; Playwright</h2>
+<ul>
+    <li><strong>Time-box slow operations:</strong> race an action against a deadline so a stuck operation fails the test instead of hanging the runner.</li>
+    <li><strong>Fastest response wins:</strong> probe the quickest of several mirrors / CDNs.</li>
+    <li><strong>State detection:</strong> check whether a background operation still pending before deciding to wait or skip.</li>
+</ul>
+<pre><code><span class="kw">const</span> timeoutError = <span class="kw">new</span> Promise((_, reject) =&gt;
+    setTimeout(() =&gt; reject(<span class="kw">new</span> Error(<span class="str">"Navigation timed out"</span>)), <span class="num">10000</span>));
+
+<span class="kw">try</span> {
+    <span class="kw">await</span> Promise.race([page.goto(<span class="str">"https://example.com"</span>), timeoutError]);
+} <span class="kw">catch</span> (err) {
+    console.error(<span class="str">"Test aborted:"</span>, err.message);
+}</code></pre>
+
+<!-- ============ 10. COMMON MISTAKES ============ -->
+<h2>10. Common mistakes &amp; interview traps</h2>
+<ul>
+    <li><strong>Treating <code>race</code> as "first success"</strong> → it's first <em>settled</em>; a fast rejection still wins the race. Use <code>Promise.any</code> for first success.</li>
+    <li><strong>Empty array</strong> → returns a forever-pending promise that can silently hang your test suite.</li>
+    <li><strong>Expecting synchronous settlement</strong> → <code>race</code> is always asynchronous, even with pre-settled inputs.</li>
+    <li><strong>Thinking <code>race</code> starts the promises</strong> → it doesn't; the promises were already running when created. <code>race</code> only watches them.</li>
+    <li><strong>Ignoring losing rejections</strong> → they're marked handled by the combinator, so a loser's rejection won't trigger unhandled-rejection warnings — but it's also silently discarded.</li>
+</ul>
+
+<!-- ============ 11. IQ QUESTIONS ============ -->
+<h2>11. Quick IQ questions (with answers)</h2>
+<dl class="faq">
+    <dt>Q: What does <code>Promise.race([...])</code> return?</dt>
+    <dd>A: A single promise that settles with the state of the first input promise to settle — fulfilled if that winner fulfilled, rejected if it rejected.</dd>
+
+    <dt>Q: What is <code>Promise.race([])</code>?</dt>
+    <dd>A: A promise that stays pending forever — nothing in the iterable can ever settle it.</dd>
+
+    <dt>Q: Same inputs promise.resolve(1) and promise.reject(err) — which wins?</dt>
+    <dd>A: The first one found in the iterable wins the race (both are already settled). Order matters.</dd>
+
+    <dt>Q: <code>Promise.race</code> vs <code>Promise.any</code>?</dt>
+    <dd>A: <code>race</code> takes the first <em>settled</em> promise (success or failure); <code>any</code> takes the first <em>fulfilled</em> one and skips rejections until all reject (then AggregateError).</dd>
+
+    <dt>Q: Does <code>Promise.race</code> make faster code?</dt>
+    <dd>A: No — the promises all run concurrently already. <code>race</code> only decides which result you observe; it doesn't speed up or cancel the others.</dd>
+
+    <dt>Q: A fast request rejects while a slow one would succeed. What do you get with race?</dt>
+    <dd>A: A rejection with the fast request's reason. If you wanted the first success, use <code>Promise.any</code>.</dd>
+</dl>
+
+<!-- ============ 12. REFERENCES ============ -->
+<h2>12. References</h2>
+<ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race">MDN — Promise.race()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/any">MDN — Promise.any()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all">MDN — Promise.all()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled">MDN — Promise.allSettled()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">MDN — Promise (promise concurrency)</a></li>
+    <li><a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise.race">ECMAScript 2027 spec — Promise.race</a></li>
+</ul>
+
+<footer>
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 17 (Promise) · Date: 2026-08-21
+</footer>
+
+</div>
+
+<script>
+function runExample(codeId, outId) {
+    const codeEl = document.getElementById(codeId);
+    const outEl = document.getElementById(outId);
+    outEl.style.display = 'block';
+    outEl.innerHTML = '<span class="ok">Running…</span>';
+
+    // textContent decodes the HTML entities used by syntax highlighting
+    const raw = codeEl.textContent;
+
+    const logs = [];
+    const log = function (...args) {
+        logs.push(Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+    };
+
+    // Route console.log calls to our capture function (comments are unaffected)
+    const src = raw.replace(/console\.log\s*\(/g, 'logRaw(');
+
+    try {
+        const runner = new Function('logRaw', src + '\n');
+        runner(log);
+        // Async callbacks (microtasks) run after the runner returns — render once they've flushed
+        setTimeout(function () {
+            outEl.innerHTML = logs.length
+                ? logs.map(l => '<span class="ok">' + l.replace(/</g, '&lt;') + '</span>').join('\n')
+                : '<span class="ok">(no console output)</span>';
+        }, 150);
+    } catch (e) {
+        outEl.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+</script>
+</body>
+</html>

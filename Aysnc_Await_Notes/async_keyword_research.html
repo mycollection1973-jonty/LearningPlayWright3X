@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Async Keyword — Full Research Notes</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #273449;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --green: #4ade80;
+        --red: #f87171;
+        --yellow: #facc15;
+        --purple: #c084fc;
+        --code-bg: #0b1220;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.65;
+        padding: 2rem 1rem;
+    }
+    .wrap { max-width: 950px; margin: 0 auto; }
+    header.hero {
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        border-radius: 14px;
+        padding: 2.2rem 2rem;
+        margin-bottom: 2rem;
+    }
+    header.hero h1 { font-size: 2rem; color: #fff; margin-bottom: .4rem; }
+    header.hero p { color: #e0f2fe; font-size: 1.05rem; }
+    .badge {
+        display: inline-block; background: rgba(255,255,255,.18);
+        padding: .15rem .6rem; border-radius: 20px; font-size: .8rem;
+        color: #fff; margin-top: .6rem;
+    }
+    h2 {
+        color: var(--accent); font-size: 1.35rem;
+        margin: 2.4rem 0 1rem; padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+    }
+    h3 { color: var(--purple); margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+    p, li { color: var(--text); }
+    .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0;
+    }
+    .note {
+        border-left: 4px solid var(--yellow); background: rgba(250,204,21,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .warn {
+        border-left: 4px solid var(--red); background: rgba(248,113,113,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .tip {
+        border-left: 4px solid var(--green); background: rgba(74,222,128,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+        font-size: .92rem; background: var(--panel); border-radius: 10px; overflow: hidden;
+    }
+    th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--panel2); color: var(--accent); }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+        font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    p code, li code { background: var(--panel2); padding: .1rem .4rem; border-radius: 5px; font-size: .88em; color: var(--yellow); }
+    pre {
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto;
+        font-size: .88rem; line-height: 1.55; margin: .8rem 0;
+    }
+    pre .kw { color: var(--accent); }
+    pre .fn { color: var(--yellow); }
+    pre .str { color: var(--green); }
+    pre .cm { color: var(--muted); font-style: italic; }
+    pre .num { color: var(--purple); }
+    .run-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .run-row button {
+        background: var(--accent); color: #062033; border: none; cursor: pointer;
+        padding: .45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: .88rem;
+    }
+    .run-row button:hover { filter: brightness(1.15); }
+    #output {
+        background: #062033; border: 1px solid var(--border); border-radius: 8px;
+        padding: .8rem 1rem; font-family: inherit; font-size: .9rem;
+        white-space: pre-wrap; min-height: 2.2rem; display: none; margin: .6rem 0;
+    }
+    #output .ok { color: var(--green); }
+    #output .err { color: var(--red); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+    .faq dt { font-weight: 700; color: var(--accent); margin-top: 1rem; }
+    .faq dd { margin-left: 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+    <h1>The <code>async</code> Keyword — Full Research</h1>
+    <p>A complete reference on async functions in JavaScript: what they are, how they behave, and how to use them in QA / Playwright automation.</p>
+    <span class="badge">JavaScript · ECMAScript 2017 (ES8) · Baseline: April 2017</span>
+</header>
+
+<!-- ============ 1. WHAT IS async ============ -->
+<h2>1. What is the <code>async</code> keyword?</h2>
+<p>
+    <code>async</code> is a keyword placed before a function to mark it as an
+    <strong>asynchronous function</strong>. Its job is simple: it makes the function
+    always return a <code>Promise</code>, and it enables the <code>await</code> keyword
+    to be used <em>inside</em> the function body.
+</p>
+<p>Defining a function as <code>async</code>:</p>
+<ul>
+    <li>Always returns a <code>Promise</code> — even if you return a plain value.</li>
+    <li>Allows <code>await</code> inside its body to pause execution until a promise settles.</li>
+    <li>Lets you handle async errors with ordinary <code>try</code>/<code>catch</code> — no more <code>.catch()</code> chains.</li>
+    <li>Creates an <code>AsyncFunction</code> object under the hood.</li>
+</ul>
+
+<!-- ============ 2. SYNTAX ============ -->
+<h2>2. Syntax — all 5 forms</h2>
+<div class="grid2">
+<pre><code><span class="kw">async function</span> <span class="fn">name</span>(param1, param2) {
+    <span class="cm">// ...body</span>
+}</code></pre>
+<pre><code><span class="kw">const</span> name = <span class="kw">async function</span> (param) {
+    <span class="cm">// function expression</span>
+};</code></pre>
+<pre><code><span class="kw">const</span> name = <span class="kw">async</span> (param) =&gt; {
+    <span class="cm">// async arrow function</span>
+};</code></pre>
+<pre><code><span class="kw">const</span> obj = {
+    <span class="kw">async</span> <span class="fn">method</span>() { <span class="cm">/* object method */</span> }
+};</code></pre>
+<pre><code><span class="kw">class</span> Runner {
+    <span class="kw">async</span> <span class="fn">run</span>() { <span class="cm">/* class method */</span> }
+}</code></pre>
+</div>
+
+<div class="note">
+    <strong>Gotcha — line terminator:</strong> you cannot put a line break between
+    <code>async</code> and <code>function</code>, otherwise Automatic Semicolon Insertion
+    (ASI) treats <code>async</code> as a plain identifier and the line as a normal
+    <code>function</code> declaration.
+</div>
+
+<!-- ============ 3. THE CORE RULE ============ -->
+<h2>3. The one rule that explains everything</h2>
+<div class="card">
+    <p style="font-size:1.05rem;"><strong>An <code>async</code> function ALWAYS returns a Promise.</strong></p>
+    <p>If you return a plain value, it is automatically wrapped using <code>Promise.resolve()</code>. If you throw, the function returns a rejected promise.</p>
+</div>
+<table>
+    <tr><th>What you write (return …)</th><th>What the caller receives</th></tr>
+    <tr><td><code>return 1;</code></td><td><code>Promise.resolve(1)</code></td></tr>
+    <tr><td><code>return "Pass";</code></td><td><code>Promise.resolve("Pass")</code></td></tr>
+    <tr><td><code>return Promise.resolve(200);</code></td><td><code>Promise.resolve(200)</code> (already a promise)</td></tr>
+    <tr><td><code>throw new Error("boom");</code></td><td>Rejected promise (error)</td></tr>
+    <tr><td>no return statement</td><td><code>Promise.resolve(undefined)</code></td></tr>
+</table>
+
+<div class="card">
+    <h3>Live example — run it below</h3>
+    <pre id="code1"><code><span class="kw">async function</span> <span class="fn">getTestResult</span>() {
+    <span class="kw">return</span> <span class="str">"Pass"</span>;   <span class="cm">// plain value</span>
+}
+
+getTestResult().then(result =&gt; {
+    console.log(result);          <span class="cm">// Pass</span>
+});
+
+<span class="kw">async function</span> <span class="fn">getStatus</span>() {
+    <span class="kw">return</span> { status: <span class="num">200</span>, body: <span class="str">"Created"</span> };
+}
+
+getStatus().then(res =&gt; {
+    console.log(res.status, res.body);  <span class="cm">// 200 Created</span>
+});</code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code1','out1')">▶ Run example</button>
+    </div>
+    <div id="out1"></div>
+</div>
+
+<div class="warn">
+    <strong>Reference identity gotcha:</strong> <code>asyncReturn()</code> returning an
+    existing promise p gives you a <em>different</em> reference than <code>p</code> itself,
+    whereas <code>Promise.resolve(p)</code> returns the same reference. Don't compare
+    promise identity against an async function's return value.
+</div>
+
+<!-- ============ 4. EXECUTION ORDER ============ -->
+<h2>4. Execution order — synchronous start, asynchronous finish</h2>
+<p>
+    Think of an async function's body as split by <code>await</code> expressions:
+</p>
+<ul>
+    <li><strong>Top-level code up to the first <code>await</code> runs synchronously</strong> — immediately, in the same tick as the call.</li>
+    <li>When <code>await</code> is hit, the function is suspended and control returns to the caller.</li>
+    <li>After the awaited promise settles, execution resumes inside a microtask (code after <code>await</code> behaves like a <code>.then()</code> callback).</li>
+    <li>An async function with <em>no</em> <code>await</code> at all runs completely synchronously (but still returns a promise).</li>
+</ul>
+
+<div class="card">
+    <h3>Live example — order of logs</h3>
+    <pre id="code2"><code>console.log(<span class="num">1</span>);  <span class="cm">// sync</span>
+
+<span class="kw">async function</span> <span class="fn">test</span>() {
+    console.log(<span class="num">2</span>);            <span class="cm">// sync part of async fn</span>
+    <span class="kw">await</span> Promise.resolve(); <span class="cm">// yield control</span>
+    console.log(<span class="num">3</span>);            <span class="cm">// resumed later (microtask)</span>
+}
+
+test();
+console.log(<span class="num">4</span>);  <span class="cm">// sync</span>
+
+<span class="cm">// Order: 1, 2, 4, 3</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code2','out2')">▶ Run example</button>
+    </div>
+    <div id="out2"></div>
+</div>
+
+<!-- ============ 5. async + await ============ -->
+<h2>5. <code>async</code> + <code>await</code> together</h2>
+<ul>
+    <li><code>await</code> is <strong>only valid inside an async function</strong> (or in ES modules at top level). Using it elsewhere throws <code>SyntaxError</code>.</li>
+    <li><code>await somePromise</code> suspends the function until the promise <em>settles</em>.</li>
+    <li>The resolved value becomes the result of the <code>await</code> expression.</li>
+    <li>If the awaited promise rejects, the rejection is thrown at the <code>await</code> line — catch it with <code>try</code>/<code>catch</code>.</li>
+</ul>
+
+<h2>6. Sequential vs parallel execution</h2>
+<table>
+    <tr><th>Pattern</th><th>Behavior</th><th>Use when</th></tr>
+    <tr>
+        <td><code>await a(); await b();</code></td>
+        <td>Second request starts only after first completes (total time = sum)</td>
+        <td>Step 2 depends on Step 1's result — e.g. Login → Dashboard</td>
+    </tr>
+    <tr>
+        <td>start both, then await</td>
+        <td>Timers run concurrently, awaits still resolve in order</td>
+        <td>Both needed, no dependency — but risky for rejections</td>
+    </tr>
+    <tr>
+        <td><code>await Promise.all([a(), b()])</code></td>
+        <td>Both start at once; waits for all; fails fast with the first rejection</td>
+        <td>Independent steps, e.g. parallel API smoke calls</td>
+    </tr>
+    <tr>
+        <td><code>await Promise.allSettled([...])</code></td>
+        <td>Waits for all; never rejects; reports each outcome</td>
+        <td>You want results even when some fail</td>
+    </tr>
+</table>
+
+<div class="warn">
+    <strong>Unhandled rejection trap:</strong> with <code>const r1 = await p1; const r2 = await p2;</code>,
+    <code>p2</code> is not wired into the promise chain until <code>p1</code> settles. If
+    <code>p2</code> rejects <em>before</em> that, you get an unhandled rejection even though
+    the caller has a <code>.catch()</code>. Use <code>Promise.all</code> /
+    <code>Promise.allSettled</code> for concurrent work.
+</div>
+
+<!-- ============ 7. ERROR HANDLING ============ -->
+<h2>7. Error handling — try / catch / finally</h2>
+<pre><code><span class="kw">async function</span> <span class="fn">testAPI</span>() {
+    <span class="kw">try</span> {
+        <span class="kw">let</span> result = <span class="kw">await</span> Promise.reject(<span class="str">"503 Service Unavailable"</span>);
+        console.log(result);
+    } <span class="kw">catch</span> (err) {
+        console.log(<span class="str">"Error :"</span>, err);   <span class="cm">// Error : 503 Service Unavailable</span>
+    } <span class="kw">finally</span> {
+        console.log(<span class="str">"Clean Up!!"</span>);      <span class="cm">// always runs</span>
+    }
+}
+
+testAPI();</code></pre>
+<p>
+    This mirrors promise behavior: <code>try</code> → <code>.then()</code>,
+    <code>catch</code> → <code>.catch()</code>, <code>finally</code> → <code>.finally()</code>.
+    The big win: straight-line, synchronous-looking error handling.
+</p>
+
+<!-- ============ 8. HOISTING ============ -->
+<h2>8. Hoisting</h2>
+<p>
+    <code>async function</code> declarations are <strong>hoisted</strong> like regular
+    <code>function</code> declarations — you can call them anywhere in their scope,
+    even before the declaration line appears.
+</p>
+<pre><code>runTest();  <span class="cm">// works — declaration is hoisted</span>
+
+<span class="kw">async function</span> <span class="fn">runTest</span>() {
+    <span class="kw">await</span> Promise.resolve(<span class="str">"Login OK"</span>);
+}</code></pre>
+<p>
+    Async <em>function expressions</em> and arrows are <strong>not</strong> hoisted —
+    same as regular function expressions.
+</p>
+
+<!-- ============ 9. QA / PLAYWRIGHT ============ -->
+<h2>9. In QA &amp; Playwright</h2>
+<p>
+    Playwright test functions are declared <code>async</code>, so you can
+    <code>await</code> every action and assertion — page interactions become straight-line code.
+</p>
+<pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+test(<span class="str">'login flow'</span>, <span class="kw">async</span> ({ page }) =&gt; {
+    <span class="kw">await</span> page.goto(<span class="str">'https://example.com/login'</span>);
+
+    <span class="kw">await</span> page.fill(<span class="str">'#username'</span>, <span class="str">'qa_user'</span>);
+    <span class="kw">await</span> page.fill(<span class="str">'#password'</span>, <span class="str">'secret'</span>);
+    <span class="kw">await</span> page.click(<span class="str">'button[type=submit]'</span>);
+
+    <span class="kw">await</span> expect(page).toHaveTitle(<span class="str">/Dashboard/</span>);
+});</code></pre>
+<div class="tip">
+    Common real-world patterns: retry flaky APIs with an async retry wrapper +
+    <code>try</code>/<code>catch</code>; run independent API smoke tests with
+    <code>Promise.all</code>; sequence dependent steps (login → dashboard → report)
+    with plain <code>await</code>.
+</div>
+
+<!-- ============ 10. COMPARISON TABLE ============ -->
+<h2>10. Promise chains vs async/await</h2>
+<table>
+    <tr><th>Aspect</th><th>Promise chain (<code>.then()</code>)</th><th><code>async</code>/<code>await</code></th></tr>
+    <tr><td>Readability</td><td>Nested callbacks, harder to follow</td><td>Flat, synchronous-looking code</td></tr>
+    <tr><td>Error handling</td><td><code>.catch()</code>, <code>.finally()</code></td><td><code>try</code>/<code>catch</code>/<code>finally</code></td></tr>
+    <tr><td>Debugging</td><td>Promise stack traces</td><td>Step-by-step like sync code</td></tr>
+    <tr><td>Sequences with dependencies</td><td>Chained <code>.then</code></td><td>Multiple <code>await</code> lines</td></tr>
+    <tr><td>Parallel work</td><td><code>Promise.all</code></td><td><code>await Promise.all(...)</code></td></tr>
+    <tr><td>Under the hood</td><td>Manual promise wiring</td><td>Same promises — just sugar (similar to generators + promises)</td></tr>
+</table>
+
+<!-- ============ 11. COMMON MISTAKES ============ -->
+<h2>11. Common mistakes &amp; interview traps</h2>
+<ul>
+    <li><strong>Using <code>await</code> outside async fn</strong> → <code>SyntaxError</code>. (Allowed at top level of ES modules.)</li>
+    <li><strong>Forgetting that async fn returns a promise</strong> → <code>const x = asyncFn()</code> is a promise, not the value. You must <code>await</code> it.</li>
+    <li><strong>Line break between <code>async</code> and <code>function</code></strong> → ASI silently breaks the declaration.</li>
+    <li><strong>Awaiting sequential-independent calls</strong> → wastes time; use <code>Promise.all</code>.</li>
+    <li><strong>No catch on concurrent awaits</strong> → unhandled rejections (see section 6).</li>
+    <li><strong>Comparing promise identity</strong> with an async fn return → always <code>false</code>.</li>
+    <li><strong>Not handling rejections at all</strong> → crashes / unhandled-rejection warnings in Node.</li>
+</ul>
+
+<!-- ============ 12. FAQ / IQ ============ -->
+<h2>12. Quick IQ questions (with answers)</h2>
+<dl class="faq">
+    <dt>Q: Does an <code>async</code> function always return a Promise?</dt>
+    <dd>A: Yes — plain return values are wrapped in <code>Promise.resolve()</code>; thrown errors produce a rejected promise.</dd>
+
+    <dt>Q: What does <code>await</code> do to the function's execution?</dt>
+    <dd>A: It suspends the async function, yields control back to the caller, and resumes (in a microtask) once the awaited promise settles.</dd>
+
+    <dt>Q: What logs and in what order?</dt>
+    <dd><code>console.log("A"); async function t(){ console.log("B"); await 0; console.log("C"); } t(); console.log("D");</code> → <strong>A, B, D, C</strong> — first <code>await</code> defers "C" to the microtask queue.</dd>
+
+    <dt>Q: Is <code>async function</code> hoisted?</dt>
+    <dd>A: Yes, like regular function declarations. Async function <em>expressions</em> are not hoisted.</dd>
+
+    <dt>Q: <code>async/await</code> vs promises — is it a different technology?</dt>
+    <dd>A: No. <code>async</code>/<code>await</code> is syntactic sugar built on the same Promises; behavior is similar to combining generators with promises.</dd>
+
+    <dt>Q: When must you use <code>Promise.all</code> instead of sequential <code>await</code>?</dt>
+    <dd>A: When steps are independent (parallel) and to guarantee rejections happen inside a wired-up chain — avoiding unhandled rejection errors.</dd>
+</dl>
+
+<!-- ============ 13. REFERENCES ============ -->
+<h2>13. References</h2>
+<ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">MDN — async function declaration</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/async_function">MDN — async function expression</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await">MDN — await operator</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">MDN — Promise</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN — Using promises guide</a></li>
+    <li><a href="https://tc39.es/ecma262/multipage/ecmascript-language-functions-and-classes.html#sec-async-function-definitions">ECMAScript 2027 spec — async function definitions</a></li>
+</ul>
+
+<footer>
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 18 (Async/Await) · Date: 2026-08-21
+</footer>
+
+</div>
+
+<script>
+function runExample(codeId, outId) {
+    const codeEl = document.getElementById(codeId);
+    const outEl = document.getElementById(outId);
+    outEl.style.display = 'block';
+    outEl.innerHTML = '<span class="ok">Running…</span>';
+
+    // textContent decodes the HTML entities used by syntax highlighting
+    const raw = codeEl.textContent;
+
+    const logs = [];
+    const log = function (...args) {
+        logs.push(Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+    };
+
+    // Route console.log calls to our capture function (comments are unaffected)
+    const src = raw.replace(/console\.log\s*\(/g, 'logRaw(');
+
+    try {
+        const runner = new Function('logRaw', src + '\n');
+        runner(log);
+        // Async callbacks (microtasks) run after the runner returns — render once they've flushed
+        setTimeout(function () {
+            outEl.innerHTML = logs.length
+                ? logs.map(l => '<span class="ok">' + l.replace(/</g, '&lt;') + '</span>').join('\n')
+                : '<span class="ok">(no console output)</span>';
+        }, 150);
+    } catch (e) {
+        outEl.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Callback — Full Research Notes</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #273449;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #22d3ee;
+        --blue: #38bdf8;
+        --red: #f87171;
+        --yellow: #facc15;
+        --green: #4ade80;
+        --purple: #c084fc;
+        --code-bg: #0b1220;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.65;
+        padding: 2rem 1rem;
+    }
+    .wrap { max-width: 950px; margin: 0 auto; }
+    header.hero {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        border-radius: 14px;
+        padding: 2.2rem 2rem;
+        margin-bottom: 2rem;
+    }
+    header.hero h1 { font-size: 2rem; color: #fff; margin-bottom: .4rem; }
+    header.hero p { color: #ecfeff; font-size: 1.05rem; }
+    .badge {
+        display: inline-block; background: rgba(255,255,255,.18);
+        padding: .15rem .6rem; border-radius: 20px; font-size: .8rem;
+        color: #fff; margin-top: .6rem;
+    }
+    h2 {
+        color: var(--accent); font-size: 1.35rem;
+        margin: 2.4rem 0 1rem; padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+    }
+    h3 { color: var(--purple); margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+    p, li { color: var(--text); }
+    .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0;
+    }
+    .note {
+        border-left: 4px solid var(--yellow); background: rgba(250,204,21,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .warn {
+        border-left: 4px solid var(--red); background: rgba(248,113,113,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .tip {
+        border-left: 4px solid var(--green); background: rgba(74,222,128,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+        font-size: .92rem; background: var(--panel); border-radius: 10px; overflow: hidden;
+    }
+    th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--panel2); color: var(--accent); }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+        font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    p code, li code { background: var(--panel2); padding: .1rem .4rem; border-radius: 5px; font-size: .88em; color: var(--yellow); }
+    pre {
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto;
+        font-size: .88rem; line-height: 1.55; margin: .8rem 0;
+    }
+    pre .kw { color: var(--accent); }
+    pre .fn { color: var(--yellow); }
+    pre .str { color: var(--green); }
+    pre .cm { color: var(--muted); font-style: italic; }
+    pre .num { color: var(--blue); }
+    .run-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .run-row button {
+        background: var(--accent); color: #03242e; border: none; cursor: pointer;
+        padding: .45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: .88rem;
+    }
+    .run-row button:hover { filter: brightness(1.15); }
+    #output {
+        background: #062033; border: 1px solid var(--border); border-radius: 8px;
+        padding: .8rem 1rem; font-family: inherit; font-size: .9rem;
+        white-space: pre-wrap; min-height: 2.2rem; display: none; margin: .6rem 0;
+    }
+    #output .ok { color: var(--green); }
+    #output .err { color: var(--red); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+    .faq dt { font-weight: 700; color: var(--accent); margin-top: 1rem; }
+    .faq dd { margin-left: 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+    <h1>The Callback Pattern — Full Research</h1>
+    <p>A complete reference on callback functions in JavaScript: sync vs async callbacks, error-first style, callback hell, and how they evolved into promises &amp; async/await.</p>
+    <span class="badge">JavaScript · Core language concept · Callbacks are as old as JS itself</span>
+</header>
+
+<!-- ============ 1. WHAT IS A CALLBACK ============ -->
+<h2>1. What is a callback function?</h2>
+<p>
+    A <strong>callback function</strong> is a function passed <em>into</em> another function as
+    an argument, which the outer function then <strong>invokes</strong> ("calls back") to complete
+    some routine or action.
+</p>
+<ul>
+    <li><strong>You</strong> write the function (the consumer of a callback-based API).</li>
+    <li><strong>The API</strong> (the caller / provider) takes your function and executes it at the right moment.</li>
+    <li><strong>The API controls the parameters</strong> passed into your callback — and may use your callback's <em>return value</em> to guide its own behavior.</li>
+</ul>
+<p>The canonical shape:</p>
+<pre><code><span class="kw">function</span> <span class="fn">doSomething</span>(callback) {
+    <span class="cm">// ...do work...</span>
+    callback();   <span class="cm">// "calls back" the function you passed in</span>
+}
+
+doSomething(() =&gt; console.log(<span class="str">"inside the callback"</span>));</code></pre>
+
+<!-- ============ 2. THE TWO KINDS ============ -->
+<h2>2. Synchronous vs asynchronous callbacks</h2>
+<p>
+    Callbacks can be invoked in two very different ways — and knowing which one you're dealing
+    with decides how your code behaves:
+</p>
+<table>
+    <tr><th></th><th>Synchronous callback</th><th>Asynchronous callback</th></tr>
+    <tr><td>Called when?</td><td>Immediately, during the outer function call — same tick</td><td>Later, after an async operation finishes</td></tr>
+    <tr><td>Examples</td><td><code>Array.map()</code>, <code>Array.forEach()</code>, <code>Array.filter()</code>, <code>Array.sort()</code></td><td><code>setTimeout</code>, <code>fs.readFile</code>, event listeners, <code>fetch().then()</code></td></tr>
+    <tr><td>Code after the call runs…</td><td>after the callback finished</td><td>before the callback runs</td></tr>
+</table>
+
+<div class="warn">
+    <strong>The side-effect trap (classic interview puzzle):</strong>
+</div>
+<pre><code><span class="kw">let</span> value = <span class="num">1</span>;
+
+doSomething(() =&gt; { value = <span class="num">2</span>; });
+
+console.log(value);   <span class="cm">// 1 or 2? — depends on sync vs async!</span></code></pre>
+<p>
+    If <code>doSomething</code> calls the callback <em>synchronously</em> → logs <code>2</code>.
+    If it defers the call (<em>asynchronously</em>, like <code>setTimeout(cb, 0)</code>) → logs
+    <code>1</code>, because the callback hasn't run yet.
+</p>
+
+<div class="card">
+    <h3>Live example 1 — sync vs async timing in action</h3>
+    <pre id="code1"><code><span class="kw">let</span> value = <span class="num">1</span>;
+
+<span class="cm">// SYNC version — callback runs immediately</span>
+<span class="kw">function</span> <span class="fn">doSync</span>(callback) { callback(); }
+
+<span class="cm">// ASYNC version — callback deferred to a microtask</span>
+<span class="kw">function</span> <span class="fn">doAsync</span>(callback) { queueMicrotask(callback); }
+
+doSync(() =&gt; { value = <span class="num">2</span>; });
+console.log(<span class="str">"after sync call:"</span>, value);   <span class="cm">// 2 — already ran</span>
+
+doAsync(() =&gt; { value = <span class="num">3</span>; });
+console.log(<span class="str">"right after async call:"</span>, value);  <span class="cm">// 2 — callback hasn't run yet</span>
+
+queueMicrotask(() =&gt; console.log(<span class="str">"after async callback:"</span>, value));  <span class="cm">// 3</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code1','out1')">▶ Run example</button>
+    </div>
+    <div id="out1"></div>
+</div>
+
+<!-- ============ 3. WAYS TO WRITE CALLBACKS ============ -->
+<h2>3. Ways to write a callback</h2>
+<div class="grid2">
+<pre><code><span class="cm">// 1. Named function</span>
+<span class="kw">function</span> <span class="fn">onLoad</span>(data) { console.log(data); }
+fetchData(onLoad);
+
+<span class="cm">// 2. Anonymous function expr</span>
+fetchData(<span class="kw">function</span> (data) {
+    console.log(data);
+});</code></pre>
+<pre><code><span class="cm">// 3. Arrow function (most common)</span>
+fetchData(<span class="kw">data</span> =&gt; console.log(data));
+
+<span class="cm">// 4. Method reference</span>
+<span class="kw">const</span> logger = { log: d =&gt; console.log(d) };
+fetchData(logger.log);</code></pre>
+</div>
+
+<!-- ============ 4. ERROR-FIRST CALLBACKS ============ -->
+<h2>4. The error-first callback convention (Node.js)</h2>
+<p>
+    Node-style APIs follow a strict convention so every callback knows where the error lives:
+    the <strong>first parameter is the error</strong> (or <code>null</code>), and the result comes
+    after it:
+</p>
+<pre><code><span class="fn">readFile</span>(<span class="str">"./config.json"</span>, (error, result) =&gt; {
+    <span class="kw">if</span> (error) {
+        console.error(<span class="str">"Failed:"</span>, error.message);
+        <span class="kw">return</span>;               <span class="cm">// stop early on error</span>
+    }
+    console.log(result);   <span class="cm">// error was null — safe to use result</span>
+});</code></pre>
+<p>
+    The callback must <em>check the error first</em>, because a non-null error means
+    <code>result</code> is meaningless.
+</p>
+
+<div class="card">
+    <h3>Live example 2 — error-first callback pattern</h3>
+    <pre id="code2"><code><span class="kw">function</span> <span class="fn">lookupUser</span>(id, callback) {
+    <span class="cm">// simulates an async DB lookup</span>
+    queueMicrotask(() =&gt; {
+        <span class="kw">if</span> (id &lt; <span class="num">0</span>) {
+            callback(<span class="kw">new</span> Error(<span class="str">"invalid id"</span>), <span class="kw">null</span>);
+        } <span class="kw">else</span> {
+            callback(<span class="kw">null</span>, { id, name: <span class="str">"QA User"</span> });
+        }
+    });
+}
+
+<span class="cm">// consumer side — always check error FIRST</span>
+lookupUser(<span class="num">42</span>, (error, user) =&gt; {
+    <span class="kw">if</span> (error) <span class="kw">return</span> console.log(<span class="str">"Error:"</span>, error.message);
+    console.log(user.id, user.name);   <span class="cm">// 42 QA User</span>
+});
+
+lookupUser(-<span class="num">1</span>, (error, user) =&gt; {
+    <span class="kw">if</span> (error) <span class="kw">return</span> console.log(<span class="str">"Error:"</span>, error.message);  <span class="cm">// Error: invalid id</span>
+    console.log(user);
+});</code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code2','out2')">▶ Run example</button>
+    </div>
+    <div id="out2"></div>
+</div>
+
+<!-- ============ 5. CAN'T RETURN FROM A CALLBACK ============ -->
+<h2>5. The "I can't return a value" trap</h2>
+<p>
+    One of the most confusing things about callbacks: <strong>you cannot <code>return</code> a value
+    from an async callback</strong> — by the time the callback runs, the outer function has already returned.
+</p>
+<pre><code><span class="cm">// WRONG — returns undefined!</span>
+<span class="kw">function</span> <span class="fn">getConfig</span>() {
+    <span class="kw">let</span> config;
+    readFile(<span class="str">"./config.json"</span>, (err, data) =&gt; { config = data; });
+    <span class="kw">return</span> config;   <span class="cm">// undefined — the callback hasn't run yet</span>
+}
+
+<span class="cm">// RIGHT — consume the value inside the callback, or wrap in a Promise</span>
+<span class="kw">function</span> <span class="fn">getConfigAsync</span>() {
+    <span class="kw">return new</span> Promise((resolve, reject) =&gt; {
+        readFile(<span class="str">"./config.json"</span>, (err, data) =&gt; {
+            <span class="kw">if</span> (err) reject(err); <span class="kw">else</span> resolve(data);
+        });
+    });
+}</code></pre>
+<div class="tip">This trap is exactly why Promises were created — see the Promise series of pages in this folder.</div>
+
+<!-- ============ 6. CALLBACK HELL ============ -->
+<h2>6. Callback hell — the pyramid of doom</h2>
+<p>
+    When steps depend on each other, each callback must nest inside the previous one. Levels of
+    nesting grow with each step, and the code drifts to the right — "the pyramid of doom":
+</p>
+
+<div class="card">
+    <h3>Live example 3 — nested sequential callbacks</h3>
+    <pre id="code3"><code><span class="cm">// Simulated async step that calls back with a label</span>
+<span class="kw">function</span> <span class="fn">step</span>(name, next) {
+    queueMicrotask(() =&gt; next(name));
+}
+
+<span class="cm">// Each step depends on the previous one → nested callbacks</span>
+step(<span class="str">"Open browser"</span>, s1 =&gt; {
+    step(<span class="str">"Login"</span>, s2 =&gt; {
+        step(<span class="str">"Run test"</span>, s3 =&gt; {
+            step(<span class="str">"Teardown"</span>, s4 =&gt; {
+                console.log(s1 + <span class="str">" → "</span> + s2 + <span class="str">" → "</span> + s3 + <span class="str">" → "</span> + s4);
+            });
+        });
+    });
+});
+<span class="cm">// Open browser → Login → Run test → Teardown</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code3','out3')">▶ Run example</button>
+    </div>
+    <div id="out3"></div>
+</div>
+
+<p>Four real problems with this shape:</p>
+<ul>
+    <li><strong>Readability</strong> — indentation depth grows with every dependent step.</li>
+    <li><strong>Error handling</strong> — every level needs its own <code>if (err)</code> check.</li>
+    <li><strong>Inversion of control</strong> — the API decides when your code runs (and whether it runs at all).</li>
+    <li><strong>Fragility</strong> — mixing one async call with sync logic is easy to get wrong.</li>
+</ul>
+
+<!-- ============ 7. THE EVOLUTION ============ -->
+<h2>7. The evolution: callbacks → promises → async/await</h2>
+<pre><code><span class="cm">// 1. Callbacks — nested, hard to read</span>
+step1(x =&gt; {
+    step2(x, y =&gt; {
+        step3(y, z =&gt; console.log(z));
+    });
+});
+
+<span class="cm">// 2. Promises — flat chains</span>
+step1()
+    .then(x =&gt; step2(x))
+    .then(y =&gt; step3(y))
+    .then(z =&gt; console.log(z));
+
+<span class="cm">// 3. async/await — reads like synchronous code</span>
+<span class="kw">async function</span> <span class="fn">run</span>() {
+    <span class="kw">const</span> x = <span class="kw">await</span> step1();
+    <span class="kw">const</span> y = <span class="kw">await</span> step2(x);
+    <span class="kw">const</span> z = <span class="kw">await</span> step3(y);
+    console.log(z);
+}</code></pre>
+<p>
+    Same three steps, three generations of syntax. The goal was always the same:
+    <em>"do step 2 after step 1 finishes"</em> without letting code sprawl to the right.
+</p>
+
+<!-- ============ 8. QA / PLAYWRIGHT ============ -->
+<h2>8. Callbacks in QA &amp; Playwright</h2>
+<ul>
+    <li><strong>Playwright prefers promises</strong> — <code>page.waitForFunction()</code>, listeners and hooks still accept callbacks:</li>
+</ul>
+<pre><code><span class="kw">await</span> page.waitForFunction(() =&gt; document.querySelector(<span class="str">"#spinner"</span>) === <span class="kw">null</span>);
+
+page.on(<span class="str">"console"</span>, msg =&gt; console.log(<span class="str">`[page]`</span>, msg.text()));
+page.on(<span class="str">"response"</span>, res =&gt; {
+    <span class="kw">if</span> (res.status() === <span class="num">503</span>) failures.push(res.url());
+});
+
+<span class="kw">await</span> page.evaluate((num) =&gt; Math.pow(num, <span class="num">2</span>), <span class="num">4</span>);  <span class="cm">// callback runs in the page</span></code></pre>
+<ul>
+    <li><strong>Custom retry with callbacks</strong> — poll a condition until it's true or the deadline passes (see the <code>new Promise</code> page for the wrapped version).</li>
+</ul>
+
+<!-- ============ 9. COMMON MISTAKES ============ -->
+<h2>9. Common mistakes &amp; interview traps</h2>
+<ul>
+    <li><strong>Calling the callback instead of passing it</strong> → <code>setTimeout(cb(), 1000)</code> runs <code>cb()</code> immediately and passes its return value. Pass the reference: <code>setTimeout(cb, 1000)</code>.</li>
+    <li><strong>Forgetting the error-first check</strong> → using <code>result</code> when <code>error</code> is truthy.</li>
+    <li><strong>Trying to <code>return</code> from an async callback</strong> → the outer function already returned; you get <code>undefined</code>.</li>
+    <li><strong>Not realizing the callback fires <em>later</em></strong> → code after the API call runs before your callback; guard against stale state.</li>
+    <li><strong>Abusing <code>forEach</code> + async callbacks</strong> → <code>forEach</code> doesn't wait; it fires all callbacks immediately. Use a <code>for...of</code> loop or <code>Promise.all</code> for sequencing.</li>
+    <li><strong>Swallowing the error</strong> → an error-first callback that ignores <code>error</code> hides real failures from your test run.</li>
+</ul>
+
+<!-- ============ 10. IQ QUESTIONS ============ -->
+<h2>10. Quick IQ questions (with answers)</h2>
+<dl class="faq">
+    <dt>Q: What is a callback function?</dt>
+    <dd>A: A function passed as an argument to another function, which the receiving function invokes to complete an action.</dd>
+
+    <dt>Q: Sync or async — how are the callbacks of <code>map</code>, <code>forEach</code>, <code>setTimeout</code>, and <code>.then()</code> called?</dt>
+    <dd>A: <code>map</code>/<code>forEach</code> call back synchronously; <code>setTimeout</code>/<code>then</code> call back asynchronously (later, in a task/microtask).</dd>
+
+    <dt>Q: Why does this log <code>1</code> instead of <code>2</code>?</dt>
+    <dd><code>let v = 1; setTimeout(() => v = 2, 0); console.log(v);</code> → the callback is deferred; <code>console.log(v)</code> runs first. Order would be the opposite for a sync API.</dd>
+
+    <dt>Q: What is the error-first callback convention?</dt>
+    <dd>A: The callback's first parameter is the error (or <code>null</code>); the result follows. Always check the error before using the result. Standard in Node.js APIs.</dd>
+
+    <dt>Q: Can I <code>return</code> a value from an async callback?</dt>
+    <dd>A: No — the outer function has already returned. Consume the value inside the callback, or wrap the API in a <code>new Promise</code>.</dd>
+
+    <dt>Q: How do you escape callback hell?</dt>
+    <dd>A: Promises flatten the nesting into chains; <code>async</code>/<code>await</code> flattens it again into straight-line code.</dd>
+</dl>
+
+<!-- ============ 11. REFERENCES ============ -->
+<h2>11. References</h2>
+<ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Callback_function">MDN — Callback function (glossary)</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN — Using promises (timing notes)</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions">MDN — Functions guide</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Callback_(computer_programming)">Wikipedia — Callback (computer programming)</a></li>
+</ul>
+
+<footer>
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 16 (Callback) · Date: 2026-08-21
+</footer>
+
+</div>
+
+<script>
+function runExample(codeId, outId) {
+    const codeEl = document.getElementById(codeId);
+    const outEl = document.getElementById(outId);
+    outEl.style.display = 'block';
+    outEl.innerHTML = '<span class="ok">Running…</span>';
+
+    // textContent decodes the HTML entities used by syntax highlighting
+    const raw = codeEl.textContent;
+
+    const logs = [];
+    const log = function (...args) {
+        logs.push(Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+    };
+
+    // Route console.log calls to our capture function (comments are unaffected)
+    const src = raw.replace(/console\.log\s*\(/g, 'logRaw(');
+
+    try {
+        const runner = new Function('logRaw', src + '\n');
+        runner(log);
+        // Async callbacks (microtasks) run after the runner returns — render once they've flushed
+        setTimeout(function () {
+            outEl.innerHTML = logs.length
+                ? logs.map(l => '<span class="ok">' + l.replace(/</g, '&lt;') + '</span>').join('\n')
+                : '<span class="ok">(no console output)</span>';
+        }, 150);
+    } catch (e) {
+        outEl.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+</script>
+</body>
+</html>

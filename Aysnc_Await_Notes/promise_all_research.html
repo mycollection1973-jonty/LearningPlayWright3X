@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promise.all — Full Research Notes</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #273449;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #4ade80;
+        --blue: #38bdf8;
+        --red: #f87171;
+        --yellow: #facc15;
+        --purple: #c084fc;
+        --code-bg: #0b1220;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        line-height: 1.65;
+        padding: 2rem 1rem;
+    }
+    .wrap { max-width: 950px; margin: 0 auto; }
+    header.hero {
+        background: linear-gradient(135deg, #22c55e, #14b8a6);
+        border-radius: 14px;
+        padding: 2.2rem 2rem;
+        margin-bottom: 2rem;
+    }
+    header.hero h1 { font-size: 2rem; color: #fff; margin-bottom: .4rem; }
+    header.hero p { color: #ecfdf5; font-size: 1.05rem; }
+    .badge {
+        display: inline-block; background: rgba(255,255,255,.18);
+        padding: .15rem .6rem; border-radius: 20px; font-size: .8rem;
+        color: #fff; margin-top: .6rem;
+    }
+    h2 {
+        color: var(--accent); font-size: 1.35rem;
+        margin: 2.4rem 0 1rem; padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+    }
+    h3 { color: var(--blue); margin: 1.4rem 0 .6rem; font-size: 1.05rem; }
+    p, li { color: var(--text); }
+    .card {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1rem 0;
+    }
+    .note {
+        border-left: 4px solid var(--yellow); background: rgba(250,204,21,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .warn {
+        border-left: 4px solid var(--red); background: rgba(248,113,113,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    .tip {
+        border-left: 4px solid var(--green, #4ade80); background: rgba(74,222,128,.08);
+        padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1rem 0;
+    }
+    table {
+        width: 100%; border-collapse: collapse; margin: 1rem 0;
+        font-size: .92rem; background: var(--panel); border-radius: 10px; overflow: hidden;
+    }
+    th, td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--panel2); color: var(--accent); }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+        font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+    p code, li code { background: var(--panel2); padding: .1rem .4rem; border-radius: 5px; font-size: .88em; color: var(--yellow); }
+    pre {
+        background: var(--code-bg); border: 1px solid var(--border);
+        border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto;
+        font-size: .88rem; line-height: 1.55; margin: .8rem 0;
+    }
+    pre .kw { color: var(--accent); }
+    pre .fn { color: var(--yellow); }
+    pre .str { color: var(--green, #4ade80); }
+    pre .cm { color: var(--muted); font-style: italic; }
+    pre .num { color: var(--blue); }
+    .run-row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+    .run-row button {
+        background: var(--accent); color: #06281a; border: none; cursor: pointer;
+        padding: .45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: .88rem;
+    }
+    .run-row button:hover { filter: brightness(1.15); }
+    #output {
+        background: #062033; border: 1px solid var(--border); border-radius: 8px;
+        padding: .8rem 1rem; font-family: inherit; font-size: .9rem;
+        white-space: pre-wrap; min-height: 2.2rem; display: none; margin: .6rem 0;
+    }
+    #output .ok { color: var(--green, #4ade80); }
+    #output .err { color: var(--red); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+    .faq dt { font-weight: 700; color: var(--accent); margin-top: 1rem; }
+    .faq dd { margin-left: 0; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+    <h1><code>Promise.all()</code> — Full Research</h1>
+    <p>A complete reference on the Promise.all static method: batching promises, fail-fast behavior, result ordering, concurrency patterns, and QA/Playwright usage.</p>
+    <span class="badge">JavaScript · ECMAScript 2015 (ES6) · Baseline: July 2015</span>
+</header>
+
+<!-- ============ 1. WHAT IS Promise.all ============ -->
+<h2>1. What is <code>Promise.all()</code>?</h2>
+<p>
+    <code>Promise.all()</code> is a <strong>static method</strong> that takes an
+    <strong>iterable</strong> (usually an array) of promises and returns a
+    <strong>single promise</strong> that settles based on <em>all</em> of them.
+</p>
+<ul>
+    <li><strong>All fulfill</strong> → returned promise fulfills with an <strong>array of fulfillment values</strong>.</li>
+    <li><strong>Any rejects</strong> → returned promise rejects immediately with that <strong>first rejection reason</strong> (fail-fast).</li>
+    <li>It's one of the four promise <em>concurrency</em> methods: <code>all</code>, <code>allSettled</code>, <code>any</code>, <code>race</code>.</li>
+</ul>
+
+<!-- ============ 2. SYNTAX ============ -->
+<h2>2. Syntax</h2>
+<pre><code>Promise.all(iterable)</code></pre>
+<table>
+    <tr><th>Part</th><th>Meaning</th></tr>
+    <tr><td><code>iterable</code></td><td>An iterable such as an array of promises (non-promise values are allowed — see §5).</td></tr>
+    <tr><td>Return value</td><td>A single <code>Promise</code> (see the settle rules below).</td></tr>
+</table>
+
+<h3>Settle rules in detail</h3>
+<table>
+    <tr><th>Input</th><th>Behavior</th></tr>
+    <tr><td>Empty iterable <code>Promise.all([])</code></td><td>Already fulfilled with <code>[]</code> — synchronously (the only sync case).</td></tr>
+    <tr><td>All promises fulfill</td><td>Fulfills <em>asynchronously</em> with an array of values <strong>in input order</strong>, regardless of completion order.</td></tr>
+    <tr><td>Any promise rejects</td><td>Rejects <em>asynchronously</em> with the <strong>first promise's rejection reason</strong>. Later rejections are ignored (no unhandled-rejection events).</td></tr>
+    <tr><td>Mixed values &amp; promises</td><td>Non-promise values are counted as already-fulfilled slots; the result includes them in order.</td></tr>
+</table>
+
+<div class="note">
+    <strong>Marks everything "handled":</strong> the moment you call
+    <code>Promise.all([...])</code>, it attaches handlers to every input promise. Rejections after
+    the first one are swallowed silently — they won't trigger <code>unhandledrejection</code>
+    warnings the way sequential <code>await</code> chains can.
+</div>
+
+<!-- ============ 3. LIVE EXAMPLES ============ -->
+<h2>3. Live examples — run them below</h2>
+
+<div class="card">
+    <h3>Example 1 — basic batching (mixed values)</h3>
+    <pre id="code1"><code><span class="kw">const</span> p1 = Promise.resolve(<span class="num">3</span>);
+<span class="kw">const</span> p2 = <span class="num">42</span>;   <span class="cm">// plain value — still counted</span>
+<span class="kw">const</span> p3 = <span class="kw">new</span> Promise(resolve =&gt; resolve(<span class="str">"foo"</span>));
+
+Promise.all([p1, p2, p3]).then(values =&gt; {
+    console.log(values);   <span class="cm">// [3,42,"foo"]</span>
+});
+<span class="cm">// [3,42,"foo"]</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code1','out1')">▶ Run example</button>
+    </div>
+    <div id="out1"></div>
+</div>
+
+<div class="card">
+    <h3>Example 2 — results keep INPUT order, not completion order</h3>
+    <pre id="code2"><code><span class="kw">const</span> slow = <span class="kw">new</span> Promise(res =&gt; queueMicrotask(() =&gt; res(<span class="num">3</span>)));
+<span class="kw">const</span> fast1 = Promise.resolve(<span class="num">1</span>);
+<span class="kw">const</span> fast2 = Promise.resolve(<span class="num">2</span>);
+<span class="cm">// Completion order: 1, 2, then 3.</span>
+<span class="cm">// Result order    : 3, 1, 2 (matches the input array).</span>
+
+Promise.all([slow, fast1, fast2]).then(values =&gt; {
+    console.log(values);   <span class="cm">// [3,1,2]</span>
+});</code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code2','out2')">▶ Run example</button>
+    </div>
+    <div id="out2"></div>
+</div>
+
+<div class="card">
+    <h3>Example 3 — fail-fast on the first rejection</h3>
+    <pre id="code3"><code><span class="kw">const</span> p1 = Promise.resolve(<span class="str">"Ok service"</span>);
+<span class="kw">const</span> p2 = Promise.reject(<span class="kw">new</span> Error(<span class="str">"Server down"</span>));
+<span class="kw">const</span> p3 = Promise.resolve(<span class="str">"Never used"</span>);
+
+Promise.all([p1, p2, p3])
+    .then(values =&gt; console.log(values))
+    .catch(err =&gt; console.log(<span class="str">"rejected:"</span>, err.message));
+<span class="cm">// rejected: Server down</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code3','out3')">▶ Run example</button>
+    </div>
+    <div id="out3"></div>
+</div>
+
+<div class="card">
+    <h3>Example 4 — with async/await + destructuring (parallel API smoke test)</h3>
+    <pre id="code4"><code><span class="kw">function</span> <span class="fn">apiCall</span>(name) {
+    <span class="kw">return new</span> Promise(resolve =&gt; resolve(name + <span class="str">": 200 OK"</span>));
+}
+
+<span class="kw">async function</span> <span class="fn">parallelTest</span>() {
+    console.log(<span class="str">"Starting of the Test"</span>);
+
+    <span class="kw">const</span> [auth, user, payment] = <span class="kw">await</span> Promise.all([
+        apiCall(<span class="str">"Auth Service"</span>),
+        apiCall(<span class="str">"User Service"</span>),
+        apiCall(<span class="str">"Payment Service"</span>)
+    ]);
+
+    console.log(auth);
+    console.log(user);
+    console.log(payment);
+}
+
+parallelTest();
+<span class="cm">// Starting of the Test</span>
+<span class="cm">// Auth Service: 200 OK</span>
+<span class="cm">// User Service: 200 OK</span>
+<span class="cm">// Payment Service: 200 OK</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code4','out4')">▶ Run example</button>
+    </div>
+    <div id="out4"></div>
+</div>
+
+<!-- ============ 4. CONCURRENCY PATTERN ============ -->
+<h2>4. The over-awaiting trap &amp; running async functions concurrently</h2>
+<p>
+    Compare these two versions of the same function:
+</p>
+<div class="grid2">
+<pre><code><span class="cm">// SLOW — steps run one after another</span>
+<span class="kw">async function</span> <span class="fn">getPrice</span>() {
+    <span class="kw">const</span> choice = <span class="kw">await</span> promptForDishChoice();
+    <span class="kw">const</span> prices = <span class="kw">await</span> fetchPrices();  <span class="cm">// waits for choice first</span>
+    <span class="kw">return</span> prices[choice];
+}</code></pre>
+<pre><code><span class="cm">// FAST — both start immediately</span>
+<span class="kw">async function</span> <span class="fn">getPrice</span>() {
+    <span class="kw">const</span> [choice, prices] = <span class="kw">await</span> Promise.all([
+        promptForDishChoice(),
+        fetchPrices(),      <span class="cm">// runs while user decides</span>
+    ]);
+    <span class="kw">return</span> prices[choice];
+}</code></pre>
+</div>
+<div class="warn">
+    <strong>Pass the CALLS, not the functions.</strong>
+    <code>Promise.all([promptForDishChoice, fetchPrices])</code> does nothing — the elements are
+    plain functions, not promises. You must invoke them:
+    <code>Promise.all([promptForDishChoice(), fetchPrices()])</code>.
+</div>
+
+<!-- ============ 5. NON-PROMISE VALUES ============ -->
+<h2>5. Non-promise values in the iterable</h2>
+<p>
+    Any non-thenable value in the array is treated as an already-fulfilled promise and
+    included in the result at its index:
+</p>
+<pre><code><span class="kw">const</span> p = Promise.all([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, Promise.resolve(<span class="num">444</span>)]);
+p.then(values =&gt; console.log(values));   <span class="cm">// [1,2,3,444]</span></code></pre>
+
+<!-- ============ 6. FAIL-FAST BEHAVIOR ============ -->
+<h2>6. Fail-fast behavior</h2>
+<p>
+    If <em>any</em> input rejects, <code>Promise.all</code> rejects immediately with that reason —
+    even if the other promises would have succeeded later:
+</p>
+<pre><code><span class="kw">const</span> p1 = <span class="kw">new</span> Promise(res =&gt; setTimeout(() =&gt; res(<span class="str">"one"</span>), <span class="num">1000</span>));
+<span class="kw">const</span> p2 = <span class="kw">new</span> Promise((res, rej) =&gt; rej(<span class="kw">new</span> Error(<span class="str">"reject"</span>)));
+
+Promise.all([p1, p2])
+    .then(values =&gt; console.log(values))
+    .catch(err =&gt; console.error(err.message));   <span class="cm">// "reject" — immediately</span></code></pre>
+
+<div class="tip">
+    <strong>Want to survive failures?</strong> Attach <code>.catch()</code> to individual promises
+    before passing them to <code>Promise.all</code>, so they always fulfill:
+    <code>Promise.all([p1.catch(e =&gt; fallback), p2.catch(e =&gt; fallback)])</code>.
+    For full per-promise status, use <code>Promise.allSettled</code> instead.
+</div>
+
+<!-- ============ 7. COMPARISON TABLE ============ -->
+<h2>7. Promise combinators compared</h2>
+<table>
+    <tr><th>Method</th><th>Settles when…</th><th>Fulfills with…</th><th>Best for</th></tr>
+    <tr><td><code>Promise.all</code></td><td>all fulfill, or the first rejection</td><td>array of values (input order)</td><td>all tasks must succeed (parallel API checks)</td></tr>
+    <tr><td><code>Promise.allSettled</code></td><td>all settle — never rejects</td><td>array of <code>{status, value|reason}</code> objects</td><td>you want every result even after failures</td></tr>
+    <tr><td><code>Promise.race</code></td><td>first promise settles (fulfillment <em>or</em> rejection)</td><td>the first settled value</td><td>timeouts / fastest response wins</td></tr>
+    <tr><td><code>Promise.any</code></td><td>first fulfillment; rejects only if <em>all</em> reject</td><td>the first fulfilled value</td><td>first success wins (redundant endpoints)</td></tr>
+</table>
+
+<!-- ============ 8. QA / PLAYWRIGHT ============ -->
+<h2>8. <code>Promise.all</code> in QA &amp; Playwright</h2>
+<ul>
+    <li><strong>Wait for multiple responses before asserting:</strong> gather <code>page.waitForResponse()</code> promises and await them in parallel.</li>
+    <li><strong>Parallel API health checks:</strong> <code>await Promise.all(endpoints.map(u =&gt; api(u)))</code> — all must be green, else the batch fails fast.</li>
+    <li><strong>Combine browser + API results:</strong> e.g. read UI state and fetch reference data concurrently, then compare.</li>
+</ul>
+<pre><code><span class="kw">const</span> [title, apiState] = <span class="kw">await</span> Promise.all([
+    page.title(),
+    request.get(<span class="str">"https://api.example.com/state"</span>).then(r =&gt; r.json()),
+]);
+
+expect(title).toBe(<span class="str">"Dashboard"</span>);
+expect(apiState.status).toBe(<span class="str">"healthy"</span>);</code></pre>
+
+<!-- ============ 9. COMMON MISTAKES ============ -->
+<h2>9. Common mistakes &amp; interview traps</h2>
+<ul>
+    <li><strong>Passing functions instead of invoked promises</strong> → <code>Promise.all([apiCall])</code> returns the functions unchanged. Always call: <code>apiCall()</code>.</li>
+    <li><strong>Forgetting it's fail-fast</strong> → if one endpoint is down, the whole batch rejects; you lose the results of the others.</li>
+    <li><strong>Assuming result order = completion order</strong> → results always match the input array's order.</li>
+    <li><strong>Sequential awaits for independent calls</strong> → pointless slow-down; use <code>Promise.all</code> for concurrency.</li>
+    <li><strong>Not handling the rejection</strong> → the batch rejection becomes an unhandled rejection; always chain <code>.catch()</code> or await inside <code>try/catch</code>.</li>
+    <li><strong>Expecting a single value back</strong> → you always get an array; destructure or index it (<code>const [a, b] = await ...</code>).</li>
+</ul>
+
+<!-- ============ 10. IQ QUESTIONS ============ -->
+<h2>10. Quick IQ questions (with answers)</h2>
+<dl class="faq">
+    <dt>Q: What does <code>Promise.all([...])</code> return?</dt>
+    <dd>A: A single Promise. It fulfills with an array of all input fulfillment values (input order), or rejects with the first rejection reason.</dd>
+
+    <dt>Q: What is <code>Promise.all([])</code>?</dt>
+    <dd>A: An already-fulfilled promise with value <code>[]</code> — the only input case that settles synchronously.</dd>
+
+    <dt>Q: Do results come back in completion order?</dt>
+    <dd>A: No — always in the order the promises appear in the input iterable, regardless of when each one resolves.</dd>
+
+    <dt>Q: One promise rejects and two were still pending. What happens?</dt>
+    <dd>A: <code>Promise.all</code> rejects immediately with that rejection reason (fail-fast). The other promises keep running, but their results are ignored and later rejections are silenced.</dd>
+
+    <dt>Q: When would you pick <code>Promise.allSettled</code> over <code>Promise.all</code>?</dt>
+    <dd>A: When you need every outcome even if some fail — e.g. collecting per-test results across a suite without aborting on the first failure.</dd>
+
+    <dt>Q: Does <code>Promise.all</code> accept non-promise values?</dt>
+    <dd>A: Yes — they're treated as already-fulfilled and included in the result array at their index.</dd>
+</dl>
+
+<!-- ============ 11. REFERENCES ============ -->
+<h2>11. References</h2>
+<ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all">MDN — Promise.all()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled">MDN — Promise.allSettled()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/any">MDN — Promise.any()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race">MDN — Promise.race()</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">MDN — Promise (promise concurrency)</a></li>
+    <li><a href="https://tc39.es/ecma262/multipage/control-abstraction-objects.html#sec-promise.all">ECMAScript 2027 spec — Promise.all</a></li>
+</ul>
+
+<footer>
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 17 (Promise) · Date: 2026-08-21
+</footer>
+
+</div>
+
+<script>
+function runExample(codeId, outId) {
+    const codeEl = document.getElementById(codeId);
+    const outEl = document.getElementById(outId);
+    outEl.style.display = 'block';
+    outEl.innerHTML = '<span class="ok">Running…</span>';
+
+    // textContent decodes the HTML entities used by syntax highlighting
+    const raw = codeEl.textContent;
+
+    const logs = [];
+    const log = function (...args) {
+        logs.push(Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+    };
+
+    // Route console.log calls to our capture function (comments are unaffected)
+    const src = raw.replace(/console\.log\s*\(/g, 'logRaw(');
+
+    try {
+        const runner = new Function('logRaw', src + '\n');
+        runner(log);
+        // Async callbacks (microtasks) run after the runner returns — render once they've flushed
+        setTimeout(function () {
+            outEl.innerHTML = logs.length
+                ? logs.map(l => '<span class="ok">' + l.replace(/</g, '&lt;') + '</span>').join('\n')
+                : '<span class="ok">(no console output)</span>';
+        }, 150);
+    } catch (e) {
+        outEl.innerHTML = '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+</script>
+</body>
+</html>

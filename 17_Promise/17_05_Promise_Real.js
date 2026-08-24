@@ -4,7 +4,7 @@ function openBrowser(){
     return new Promise(function(resolve){
         //time 10,15
         resolve("Browser has been opened!");
-    });
+    }) ;
 }
 
 function goToLogin(){
