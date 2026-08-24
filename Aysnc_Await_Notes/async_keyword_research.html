@@ -111,7 +111,7 @@
 
 <header class="hero">
     <h1>The <code>async</code> Keyword — Full Research</h1>
-    <p>A complete reference on async functions in JavaScript: what they are, how they behave, and how to use them in QA / Playwright automation.</p>
+    <p>A complete reference on async functions in JavaScript: what they are, how they behave, and how to use them in QA / Playwright automation — with a dedicated Playwright examples section.</p>
     <span class="badge">JavaScript · ECMAScript 2017 (ES8) · Baseline: April 2017</span>
 </header>
 
@@ -176,7 +176,7 @@
 <div class="card">
     <h3>Live example — run it below</h3>
     <pre id="code1"><code><span class="kw">async function</span> <span class="fn">getTestResult</span>() {
-    <span class="kw">return</span> <span class="str">"Pass"</span>;   <span class="cm">// plain value</span>
+    <span class="kw">return</span> <span class="str">"Pass"</span>;   <span class="cm">// plain value → wrapped</span>
 }
 
 getTestResult().then(result =&gt; {
@@ -220,19 +220,61 @@ getStatus().then(res =&gt; {
     <pre id="code2"><code>console.log(<span class="num">1</span>);  <span class="cm">// sync</span>
 
 <span class="kw">async function</span> <span class="fn">test</span>() {
-    console.log(<span class="num">2</span>);            <span class="cm">// sync part of async fn</span>
-    <span class="kw">await</span> Promise.resolve(); <span class="cm">// yield control</span>
-    console.log(<span class="num">3</span>);            <span class="cm">// resumed later (microtask)</span>
+    console.log(<span class="num">2</span>);            <span class="cm">// sync part of the async fn</span>
+    <span class="kw">await</span> Promise.resolve(); <span class="cm">// yield control here</span>
+    console.log(<span class="num">3</span>);            <span class="cm">// resumes as a microtask</span>
 }
 
 test();
 console.log(<span class="num">4</span>);  <span class="cm">// sync</span>
 
-<span class="cm">// Order: 1, 2, 4, 3</span></code></pre>
+<span class="cm">// Order: 1 → 2 → 4 → 3</span></code></pre>
     <div class="run-row">
         <button onclick="runExample('code2','out2')">▶ Run example</button>
     </div>
     <div id="out2"></div>
+</div>
+
+<div class="card">
+    <h3>Live example — async with NO await runs synchronously</h3>
+    <pre id="code3"><code><span class="kw">async function</span> <span class="fn">noAwait</span>() {
+    console.log(<span class="str">"runs synchronously"</span>);   <span class="cm">// no await inside</span>
+    <span class="kw">return</span> <span class="str">"value"</span>;
+}
+
+console.log(<span class="str">"before call"</span>);
+noAwait().then(v =&gt; console.log(<span class="str">"promise resolved:"</span>, v));
+console.log(<span class="str">"after call"</span>);
+
+<span class="cm">// before call</span>
+<span class="cm">// runs synchronously</span>
+<span class="cm">// after call</span>
+<span class="cm">// promise resolved: value</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code3','out3')">▶ Run example</button>
+    </div>
+    <div id="out3"></div>
+</div>
+
+<div class="card">
+    <h3>Live example — one <code>await</code> makes two calls interleave</h3>
+    <pre id="code4"><code><span class="kw">async function</span> <span class="fn">callApi</span>(name) {
+    console.log(name, <span class="str">"started"</span>);
+    <span class="kw">await</span> <span class="num">0</span>;   <span class="cm">// a single await yields control</span>
+    console.log(name, <span class="str">"finished"</span>);
+}
+
+callApi(<span class="str">"Login API"</span>);
+callApi(<span class="str">"Profile API"</span>);
+
+<span class="cm">// Login API started</span>
+<span class="cm">// Profile API started</span>
+<span class="cm">// Login API finished</span>
+<span class="cm">// Profile API finished</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code4','out4')">▶ Run example</button>
+    </div>
+    <div id="out4"></div>
 </div>
 
 <!-- ============ 5. async + await ============ -->
@@ -244,6 +286,7 @@ console.log(<span class="num">4</span>);  <span class="cm">// sync</span>
     <li>If the awaited promise rejects, the rejection is thrown at the <code>await</code> line — catch it with <code>try</code>/<code>catch</code>.</li>
 </ul>
 
+<!-- ============ 6. SEQUENTIAL vs PARALLEL ============ -->
 <h2>6. Sequential vs parallel execution</h2>
 <table>
     <tr><th>Pattern</th><th>Behavior</th><th>Use when</th></tr>
@@ -269,6 +312,38 @@ console.log(<span class="num">4</span>);  <span class="cm">// sync</span>
     </tr>
 </table>
 
+<div class="card">
+    <h3>Live example — sequential vs parallel timing</h3>
+    <pre id="code5"><code><span class="kw">const</span> sleep = ms =&gt; <span class="kw">new</span> Promise(res =&gt; setTimeout(res, ms));
+
+<span class="kw">async function</span> <span class="fn">sequential</span>() {
+    console.log(<span class="str">"SEQ 1: first API call started"</span>);
+    <span class="kw">await</span> sleep(<span class="num">50</span>);
+    console.log(<span class="str">"SEQ 2: first done, second started"</span>);
+    <span class="kw">await</span> sleep(<span class="num">50</span>);
+    console.log(<span class="str">"SEQ 3: both done (~100ms total)"</span>);
+}
+
+<span class="kw">async function</span> <span class="fn">parallel</span>() {
+    console.log(<span class="str">"PAR 1: both calls started together"</span>);
+    <span class="kw">await</span> Promise.all([sleep(<span class="num">50</span>), sleep(<span class="num">50</span>)]);
+    console.log(<span class="str">"PAR 2: both done (~50ms total)"</span>);
+}
+
+sequential();
+parallel();
+<span class="cm">// SEQ 1: first API call started</span>
+<span class="cm">// PAR 1: both calls started together</span>
+<span class="cm">// SEQ 2: first done, second started</span>
+<span class="cm">// PAR 2: both done (~50ms total)</span>
+<span class="cm">// SEQ 3: both done (~100ms total)</span></code></pre>
+
+    <div class="run-row">
+        <button onclick="runExample('code5','out5')">▶ Run example</button>
+    </div>
+    <div id="out5"></div>
+</div>
+
 <div class="warn">
     <strong>Unhandled rejection trap:</strong> with <code>const r1 = await p1; const r2 = await p2;</code>,
     <code>p2</code> is not wired into the promise chain until <code>p1</code> settles. If
@@ -279,18 +354,35 @@ console.log(<span class="num">4</span>);  <span class="cm">// sync</span>
 
 <!-- ============ 7. ERROR HANDLING ============ -->
 <h2>7. Error handling — try / catch / finally</h2>
-<pre><code><span class="kw">async function</span> <span class="fn">testAPI</span>() {
+<div class="card">
+    <h3>Live example — catching a rejected promise</h3>
+    <pre id="code6"><code><span class="kw">async function</span> <span class="fn">withTryCatch</span>() {
     <span class="kw">try</span> {
-        <span class="kw">let</span> result = <span class="kw">await</span> Promise.reject(<span class="str">"503 Service Unavailable"</span>);
-        console.log(result);
+        <span class="kw">let</span> data = <span class="kw">await</span> Promise.reject(<span class="str">"503 Service Unavailable"</span>);
+        console.log(data);
     } <span class="kw">catch</span> (err) {
-        console.log(<span class="str">"Error :"</span>, err);   <span class="cm">// Error : 503 Service Unavailable</span>
+        console.log(<span class="str">"caught:"</span>, err);
     } <span class="kw">finally</span> {
-        console.log(<span class="str">"Clean Up!!"</span>);      <span class="cm">// always runs</span>
+        console.log(<span class="str">"cleanup done"</span>);
     }
 }
 
-testAPI();</code></pre>
+<span class="kw">async function</span> <span class="fn">withCatch</span>() {
+    <span class="kw">let</span> response = <span class="kw">await</span> Promise.reject(<span class="str">"Request failed"</span>)
+        .catch(err =&gt; err + <span class="str">" → fallback"</span>);
+    console.log(response);
+}
+
+withTryCatch();
+withCatch();
+<span class="cm">// caught: 503 Service Unavailable</span>
+<span class="cm">// cleanup done</span>
+<span class="cm">// Request failed → fallback</span></code></pre>
+    <div class="run-row">
+        <button onclick="runExample('code6','out6')">▶ Run example</button>
+    </div>
+    <div id="out6"></div>
+</div>
 <p>
     This mirrors promise behavior: <code>try</code> → <code>.then()</code>,
     <code>catch</code> → <code>.catch()</code>, <code>finally</code> → <code>.finally()</code>.
@@ -315,24 +407,179 @@ testAPI();</code></pre>
 </p>
 
 <!-- ============ 9. QA / PLAYWRIGHT ============ -->
-<h2>9. In QA &amp; Playwright</h2>
+<h2>9. <code>async</code> in QA &amp; Playwright — full examples</h2>
 <p>
-    Playwright test functions are declared <code>async</code>, so you can
-    <code>await</code> every action and assertion — page interactions become straight-line code.
+    Playwright's test runner is built on <code>async</code>/<code>await</code>: the test body,
+    the hooks, the <code>request</code> fixture, custom fixtures, and even assertion retries are
+    async functions. Understanding the <code>async</code> keyword is what makes Playwright code
+    readable instead of a promise-chain maze.
+</p>
+<div class="note">
+    <strong>About the examples below:</strong> Playwright snippets need the
+    <code>@playwright/test</code> runner and a live app/API, so they are shown as
+    <em>reference patterns</em> (not runnable here). The pure-JS runnable examples are the
+    numbered cards above.
+</div>
+
+<h3>9.1 Why every Playwright test is <code>async</code></h3>
+<p>
+    Every page action returns a promise. Marking the test callback <code>async</code> lets you
+    <code>await</code> each one, so the test reads top-to-bottom like a manual test script.
+    Forgetting <code>await</code> often "works" but makes runs flaky — assertions may run on stale state.
 </p>
 <pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
 
-test(<span class="str">'login flow'</span>, <span class="kw">async</span> ({ page }) =&gt; {
+test(<span class="str">'user can log in'</span>, <span class="kw">async</span> ({ page }) =&gt; {
     <span class="kw">await</span> page.goto(<span class="str">'https://example.com/login'</span>);
-
     <span class="kw">await</span> page.fill(<span class="str">'#username'</span>, <span class="str">'qa_user'</span>);
     <span class="kw">await</span> page.fill(<span class="str">'#password'</span>, <span class="str">'secret'</span>);
     <span class="kw">await</span> page.click(<span class="str">'button[type=submit]'</span>);
 
-    <span class="kw">await</span> expect(page).toHaveTitle(<span class="str">/Dashboard/</span>);
+    <span class="kw">await</span> expect(page).toHaveURL(<span class="str">/dashboard/</span>);
+    <span class="kw">await</span> expect(page.locator(<span class="str">'.welcome'</span>)).toContainText(<span class="str">'qa_user'</span>);
 });</code></pre>
+
+<h3>9.2 Async lifecycle hooks — setup and teardown</h3>
+<p>
+    <code>beforeEach</code> / <code>afterEach</code> / <code>beforeAll</code> / <code>afterAll</code>
+    receive the same fixtures and are async for the same reason: they must <code>await</code>
+    their setup work before the test body runs.
+</p>
+<pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+test.beforeEach(<span class="kw">async</span> ({ page }) =&gt; {
+    <span class="kw">await</span> page.goto(<span class="str">'https://example.com/app'</span>);
+    <span class="kw">await</span> page.evaluate(() =&gt;
+        localStorage.setItem(<span class="str">'token'</span>, <span class="str">'test-token'</span>)
+    );
+});
+
+test.afterEach(<span class="kw">async</span> ({ page }) =&gt; {
+    <span class="kw">await</span> page.evaluate(() =&gt; localStorage.clear());
+});
+
+test(<span class="str">'dashboard loads'</span>, <span class="kw">async</span> ({ page }) =&gt; {
+    <span class="kw">await</span> expect(page.locator(<span class="str">'.dashboard'</span>)).toBeVisible();
+});</code></pre>
+
+<h3>9.3 Async API testing with the <code>request</code> fixture</h3>
+<p>
+    The <code>request</code> fixture is an async API client — every call returns a promise
+    whose <code>.json()</code> is also async. Chained awaits make request → assert flows flat.
+</p>
+<pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+test(<span class="str">'create order via API, then verify it'</span>, <span class="kw">async</span> ({ request }) =&gt; {
+    <span class="kw">const</span> createRes = <span class="kw">await</span> request.post(<span class="str">'https://api.example.com/orders'</span>, {
+        data: { product: <span class="str">'laptop'</span>, qty: <span class="num">1</span> },
+    });
+    expect(createRes.status()).toBe(<span class="num">201</span>);
+
+    <span class="kw">const</span> orderId = (<span class="kw">await</span> createRes.json()).id;
+
+    <span class="kw">const</span> getRes = <span class="kw">await</span> request.get(<span class="str">'https://api.example.com/orders/'</span> + orderId);
+    expect(getRes.ok()).toBeTruthy();
+    <span class="kw">await</span> expect(getRes.json()).resolves.toMatchObject({ product: <span class="str">'laptop'</span> });
+});</code></pre>
+
+<h3>9.4 Retrying with <code>expect.poll</code> — async polling</h3>
+<p>
+    <code>expect.poll</code> takes an <strong>async callback</strong> and re-invokes it over and
+    over until it returns the expected value or the timeout is reached — perfect for asserting
+    on the outcome of background jobs you can't wait on directly.
+</p>
+<pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+test(<span class="str">'order reaches SHIPPED after async processing'</span>, <span class="kw">async</span> ({ request }) =&gt; {
+    <span class="kw">await</span> request.post(<span class="str">'https://api.example.com/orders'</span>, {
+        data: { product: <span class="str">'laptop'</span> },
+    });
+
+    <span class="cm">// async callback is polled until it returns 'SHIPPED' or times out</span>
+    <span class="kw">await</span> expect.poll(<span class="kw">async</span> () =&gt; {
+        <span class="kw">const</span> res = <span class="kw">await</span> request.get(<span class="str">'https://api.example.com/orders/status'</span>);
+        <span class="kw">return</span> (<span class="kw">await</span> res.json()).status;
+    }, { timeout: <span class="num">10000</span> }).toBe(<span class="str">'SHIPPED'</span>);
+});</code></pre>
+
+<h3>9.5 Parallel work inside a test — <code>Promise.all</code></h3>
+<p>
+    When a page load triggers several API calls, set up all the
+    <code>waitForResponse</code> promises first, then let <code>Promise.all</code> run them
+    concurrently with the navigation.
+</p>
+<pre><code><span class="kw">import</span> { test, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+test(<span class="str">'dashboard fires two APIs — wait for both'</span>, <span class="kw">async</span> ({ page }) =&gt; {
+    <span class="kw">const</span> [userRes, statsRes] = <span class="kw">await</span> Promise.all([
+        page.waitForResponse(r =&gt; r.url().includes(<span class="str">'/api/user'</span>)),
+        page.waitForResponse(r =&gt; r.url().includes(<span class="str">'/api/stats'</span>)),
+        page.goto(<span class="str">'https://example.com/dashboard'</span>),
+    ]);
+
+    expect(userRes.status()).toBe(<span class="num">200</span>);
+    expect(statsRes.status()).toBe(<span class="num">200</span>);
+});</code></pre>
+
+<h3>9.6 Reusable async helper — retry wrapper for flaky endpoints</h3>
+<p>
+    A classic QA pattern: wrap a flaky call in an <code>async</code> retry loop using
+    <code>try</code>/<code>catch</code> and a backoff delay. Note the
+    <code>return await fn()</code> — it keeps the full stack trace if the last attempt fails.
+</p>
+<pre><code><span class="cm">// Reusable async retry wrapper — real QA pattern for flaky endpoints</span>
+<span class="kw">async function</span> <span class="fn">retry</span>(fn, attempts = <span class="num">3</span>, delayMs = <span class="num">1000</span>) {
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i &lt;= attempts; i++) {
+        <span class="kw">try</span> {
+            <span class="kw">return await</span> fn();
+        } <span class="kw">catch</span> (err) {
+            <span class="kw">if</span> (i === attempts) <span class="kw">throw</span> err;
+            console.log(<span class="str">`Attempt ${i} failed (${err.message}) — retrying…`</span>);
+            <span class="kw">await</span> <span class="kw">new</span> Promise(res =&gt; setTimeout(res, delayMs));
+        }
+    }
+}
+
+test(<span class="str">'flaky API call succeeds after retries'</span>, <span class="kw">async</span> ({ request }) =&gt; {
+    <span class="kw">const</span> data = <span class="kw">await</span> retry(<span class="kw">async</span> () =&gt; {
+        <span class="kw">const</span> res = <span class="kw">await</span> request.get(<span class="str">'https://api.example.com/flaky'</span>);
+        <span class="kw">if</span> (!res.ok()) <span class="kw">throw new</span> Error(<span class="str">'503 Service Unavailable'</span>);
+        <span class="kw">return</span> res.json();
+    }, <span class="num">3</span>, <span class="num">500</span>);
+
+    expect(data).toBeDefined();
+});</code></pre>
+
+<h3>9.7 Custom async fixture — login once, teardown after</h3>
+<p>
+    Playwright fixtures are async functions receiving <code>use</code>. Everything before
+    <code>await use(value)</code> is setup; everything after runs as teardown — a clean
+    wrapper for token management.
+</p>
+<pre><code><span class="kw">import</span> { test <span class="kw">as</span> base, expect } <span class="kw">from</span> <span class="str">'@playwright/test'</span>;
+
+<span class="cm">// Custom async fixture: logs in once per test and cleans up after</span>
+<span class="kw">export const</span> test = base.extend({
+    authToken: <span class="kw">async</span> ({ request }, use) =&gt; {
+        <span class="kw">const</span> res = <span class="kw">await</span> request.post(<span class="str">'https://api.example.com/login'</span>, {
+            data: { user: <span class="str">'qa'</span>, pass: <span class="str">'secret'</span> },
+        });
+        <span class="kw">const</span> { token } = <span class="kw">await</span> res.json();
+        <span class="kw">await</span> use(token);   <span class="cm">// hand the value to the test</span>
+        <span class="cm">// teardown runs after the test body finishes</span>
+        <span class="kw">await</span> request.post(<span class="str">'https://api.example.com/logout'</span>);
+    },
+});
+
+test(<span class="str">'calls profile API with the token'</span>, <span class="kw">async</span> ({ authToken, request }) =&gt; {
+    <span class="kw">const</span> res = <span class="kw">await</span> request.get(<span class="str">'https://api.example.com/profile'</span>, {
+        headers: { Authorization: <span class="str">`Bearer ${authToken}`</span> },
+    });
+    expect(res.ok()).toBeTruthy();
+});</code></pre>
+
 <div class="tip">
-    Common real-world patterns: retry flaky APIs with an async retry wrapper +
+    <strong>Common real-world patterns:</strong> retry flaky APIs with an async retry wrapper +
     <code>try</code>/<code>catch</code>; run independent API smoke tests with
     <code>Promise.all</code>; sequence dependent steps (login → dashboard → report)
     with plain <code>await</code>.
@@ -360,6 +607,9 @@ test(<span class="str">'login flow'</span>, <span class="kw">async</span> ({ pag
     <li><strong>No catch on concurrent awaits</strong> → unhandled rejections (see section 6).</li>
     <li><strong>Comparing promise identity</strong> with an async fn return → always <code>false</code>.</li>
     <li><strong>Not handling rejections at all</strong> → crashes / unhandled-rejection warnings in Node.</li>
+    <li><strong>Playwright: missing <code>await</code> on an action or assert</strong> → the action starts but the test moves on; flaky, hard-to-reproduce failures. Always <code>await</code> actions and <code>expect</code>.</li>
+    <li><strong>Playwright: <code>await</code> inside <code>forEach</code></strong> → callbacks fire in parallel-ish order; use <code>for...of</code> for true sequencing.</li>
+    <li><strong>Playwright: <code>beforeEach</code> not awaited</strong> → race between setup and test body; hooks must be <code>async</code> and awaited internally.</li>
 </ul>
 
 <!-- ============ 12. FAQ / IQ ============ -->
@@ -382,6 +632,12 @@ test(<span class="str">'login flow'</span>, <span class="kw">async</span> ({ pag
 
     <dt>Q: When must you use <code>Promise.all</code> instead of sequential <code>await</code>?</dt>
     <dd>A: When steps are independent (parallel) and to guarantee rejections happen inside a wired-up chain — avoiding unhandled rejection errors.</dd>
+
+    <dt>Q: Why is a Playwright test callback declared <code>async</code>?</dt>
+    <dd>A: Because every page action and assertion returns a promise. The <code>async</code> keyword lets the runner await the whole flow and report the failure correctly.</dd>
+
+    <dt>Q: Why does <code>expect.poll</code> accept an async function?</dt>
+    <dd>A: It re-invokes the async callback on every poll until it returns the expected value or the timeout expires — ideal for asserting on background/async job results.</dd>
 </dl>
 
 <!-- ============ 13. REFERENCES ============ -->
@@ -393,10 +649,13 @@ test(<span class="str">'login flow'</span>, <span class="kw">async</span> ({ pag
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">MDN — Promise</a></li>
     <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">MDN — Using promises guide</a></li>
     <li><a href="https://tc39.es/ecma262/multipage/ecmascript-language-functions-and-classes.html#sec-async-function-definitions">ECMAScript 2027 spec — async function definitions</a></li>
+    <li><a href="https://playwright.dev/docs/writing-tests">Playwright — Writing tests</a></li>
+    <li><a href="https://playwright.dev/docs/api/class-request">Playwright — Request fixture</a></li>
+    <li><a href="https://playwright.dev/docs/test-fixtures">Playwright — Fixtures</a></li>
 </ul>
 
 <footer>
-    Compiled for the LearningPlayWright3X JavaScript course · Chapter 18 (Async/Await) · Date: 2026-08-21
+    Compiled for the LearningPlayWright3X JavaScript course · Chapter 18 (Async/Await) · Date: 2026-08-24
 </footer>
 
 </div>

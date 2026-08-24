@@ -199,7 +199,7 @@ Async/await in JavaScript — covers:
 ### Aysnc_Await_Notes
 Interactive HTML reference pages (dark theme, runnable "Run example" buttons) — covers:
 - `callback_research.html` — The callback pattern: sync vs async callbacks, error-first style, callback hell, and the evolution to promises
-- `async_keyword_research.html` — The `async` keyword: syntax forms, always-returns-a-promise rule, execution order, hoisting
+- `async_keyword_research.html` — The `async` keyword: syntax forms, always-returns-a-promise rule, execution order, hoisting, plus a full Playwright examples section (test hooks, API testing, `expect.poll`, parallel waits, retry wrappers, custom fixtures)
 - `await_keyword_research.html` — The `await` operator: unwrapping promises, microtask control flow, rejection handling, top-level await
 - `new_promise_research.html` — The `Promise()` constructor: executor rules, resolve/reject, promise states, wrapping callback APIs
 - `promise_all_research.html` — `Promise.all()`: batching, input-order results, fail-fast behavior, parallel execution patterns
