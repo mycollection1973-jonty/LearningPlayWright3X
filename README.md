@@ -196,7 +196,7 @@ Async/await in JavaScript — covers:
 - `18_08_API_Flaky.js` — Retry pattern for flaky APIs (real QA scenario)
 - `18_09_IQ.js` — IQ and interview-style questions on async/await
 
-### Aysnc_Await_Notes
+### 18_Aysnc_Await_Notes
 Interactive HTML reference pages (dark theme, runnable "Run example" buttons) — covers:
 - `callback_research.html` — The callback pattern: sync vs async callbacks, error-first style, callback hell, and the evolution to promises
 - `async_keyword_research.html` — The `async` keyword: syntax forms, always-returns-a-promise rule, execution order, hoisting, plus a full Playwright examples section (test hooks, API testing, `expect.poll`, parallel waits, retry wrappers, custom fixtures)
@@ -204,6 +204,19 @@ Interactive HTML reference pages (dark theme, runnable "Run example" buttons) �
 - `new_promise_research.html` — The `Promise()` constructor: executor rules, resolve/reject, promise states, wrapping callback APIs
 - `promise_all_research.html` — `Promise.all()`: batching, input-order results, fail-fast behavior, parallel execution patterns
 - `promise_race_research.html` — `Promise.race()`: first-settled-wins, request timeouts, race vs any
+
+### 19_Export_Import
+Export/import (ES modules) in JavaScript — covers:
+- `19_01.js` — Importing named exports (`BASE_URL`, `formatUpperCaseString`) from a test util module
+- `19_02_testutil.js` — A util module: `export let BASE_URL` and `export function formatUpperCaseString` (plus a non-exported local variable)
+- `19_03.js` — Import aliases (`as`) and importing from multiple modules with `BASE_URL` name collisions
+- `19_04_utils.js` — API test util module: `BASE_URL` and test-name formatters (`TC_` prefix), with a commented Playwright `LoginPage` class reference
+- `19_05.js` — Importing a logger util: named import (`logBetter`) vs commented default import
+- `logs/19_06_logger.js` — Logger module: default export (`log`) and named export (`logBetter`) with log formatting
+
+### 20_Class_Object_OOPS
+Classes, objects, and OOP concepts in JavaScript — covers:
+- `20_01_Example.js` — Class basics: `class Person` with private attributes (`#name`, `#age`), behaviours (methods), and creating objects via `new Person()`
 
 ### PlayWright
 Playwright and automation-related material:
