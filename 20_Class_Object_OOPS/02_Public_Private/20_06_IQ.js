@@ -1,0 +1,18 @@
+// 27-08-2026
+
+class APIClient{
+    constructor(baseURL)
+    {
+        this.baseURL = baseURL;
+    }
+
+    get(path)
+    {
+        return this.baseURL + path;
+    }
+}
+
+let staging = new APIClient("https://staging.api.com");
+let prod = new APIClient("https://prod.api.com");
+console.log(staging.get("/users"));  // https://staging.api.com/users
+console.log(prod.get("/prod/users"));   // https://prod.api.com/prod/users

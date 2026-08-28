@@ -215,8 +215,21 @@ Export/import (ES modules) in JavaScript — covers:
 - `logs/19_06_logger.js` — Logger module: default export (`log`) and named export (`logBetter`) with log formatting
 
 ### 20_Class_Object_OOPS
-Classes, objects, and OOP concepts in JavaScript — covers:
-- `20_01_Example.js` — Class basics: `class Person` with private attributes (`#name`, `#age`), behaviours (methods), and creating objects via `new Person()`
+Classes, objects, and OOP concepts in JavaScript — organized into sub-topics:
+- **01_Class_Object** — Class basics, constructors, and object creation:
+  - `20_01_Example.js` — Class basics: `class Person` with private attributes (`#name`, `#age`), behaviours (methods), and creating objects via `new Person()`
+  - `20_02_Example.js` — Constructors: parameterized constructor with `this`, creating multiple objects, and why multiple constructors aren't allowed
+  - `20_03_Example.js` — Constructor hook: code executed when an object is created (`console.log` on instantiation)
+  - `20_04_Real_Constructor.js` — Real-world constructor: a `TestCase` class (name/status/priority) modeling test results with `display()`
+- **02_Public_Private** — Public vs private fields:
+  - `20_05_Real.js` — Real-world class: `Browser` class with `startBrowser()`/`closeBrowser()` behaviours
+  - `20_06_IQ.js` — IQ example: `APIClient` class with `get(path)` building URLs from a `baseURL`
+  - `20_07_Private_Public.js` — Private fields (`#apiKey`) vs public fields (`user`), and accessing them from outside
+- **03_Static_JS** — Static properties and methods:
+  - `20_08_Static.js` — Static counters: `static totalTests`/`passCount` accumulating across instances (test runner)
+  - `20_09_IQ.js` — IQ example: static `summary()` returning `passCount/totalTests` alongside instance methods
+  - `20_10_IQ.js` — IQ example: `static collegeName` shared across `Student` objects
+  - `20_11_eg.js` — Class fields example: instance fields (`b`) and their assignment in the constructor
 
 ### PlayWright
 Playwright and automation-related material:
