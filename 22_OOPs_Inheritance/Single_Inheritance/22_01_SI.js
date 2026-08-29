@@ -1,0 +1,25 @@
+// 29-08-2026
+
+class BasePage{
+    
+    constructor(pageName)
+    {
+        this.pageName = pageName;
+    }
+
+    open()
+    {
+        console.log("Opening the page");
+    }
+
+    close()
+    {
+        console.log("Closing the page");
+    }
+}
+
+class LoginPage extends BasePage{}
+
+let page = new LoginPage();
+page.open();  // Opening the page
+page.close(); // Closing the page

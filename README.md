@@ -231,6 +231,27 @@ Classes, objects, and OOP concepts in JavaScript — organized into sub-topics:
   - `20_10_IQ.js` — IQ example: `static collegeName` shared across `Student` objects
   - `20_11_eg.js` — Class fields example: instance fields (`b`) and their assignment in the constructor
 
+### 21_OOPs_Encapsulation
+Encapsulation in JavaScript — hiding data with private fields (`#`) and controlled access via getters/setters:
+- `21_01_Example.js` — Private fields (`#child1`, `#child2`) with `getChild1()`/`setChild1()` accessors
+- `21_02_Example_Car.js` — Car class with a private `#engine` field and `getEngine()`/`setEngine()` methods
+- `21_03_Example_Bank.js` — Bank account with a private `#balance` and permission-checked `setBalance()` (cashier-only)
+- `21_04_IQ.js` — IQ example: `TestCase` with private `#status` + static `#count`, read-only status via `run()`
+- `21_05_IQ.js` — IQ example: `Bug` class (title/severity) with a `display()` method
+- `21_06_IQ.js` — IQ example: `Environment` class with default constructor parameters (`staging:3000`) building a URL
+- `21_07_IQ.js` — IQ example: `User` class with a `greet()` method
+
+### 22_OOPs_Inheritance
+Inheritance in JavaScript — organized into sub-topics:
+- **Single_Inheritance** — One class inheriting from one parent:
+  - `22_01_SI.js` — Single inheritance basics: `LoginPage extends BasePage`, inheriting `open()`/`close()` methods
+  - `22_02_Example.js` — `super` usage: `super(name)` in the constructor and `super.foo()` to call parent methods
+  - `22_03_IQ.js` — IQ example: method overriding — `APITest.setup()` overrides `BaseTest.setup()`
+  - `22_04_IQ.js` — IQ example: `super()` constructor call and `super.setup()`/`super.teardown()` chaining (UI test flow)
+  - `22_05_IQ.js` — IQ example: polymorphism — `UnitTest`/`APITest`/`E2ETest` each override `execute()`
+  - `22_06_IQ.js` — IQ example: page-object style `verify()` overrides for `LoginPage`/`DashboardPage`/`CartPage`
+  - `22_07_IQ.js` — IQ example: report generators (`HTMLReport`/`JSONReport`/`TextReport`) overriding `generate()`
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
