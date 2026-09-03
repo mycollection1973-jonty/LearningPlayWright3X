@@ -8,7 +8,7 @@ class TestCase{
      constructor(name) 
     {
         this.name = name;
-        TestCase.#count++;
+      //  TestCase.#count++;
     }
 
     run(pass)
@@ -28,12 +28,12 @@ class TestCase{
 
     static getCount()
     {
-        return TestCase.#count;
+      //  return TestCase.#count;
     }
 
     static setCount(v)
     {
-        TestCase.#count = v;
+       // TestCase.#count = v;
     }
 }
 

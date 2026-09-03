@@ -1,0 +1,21 @@
+// 01-09-2026
+
+function builEndpoint(base:string, path:string) : string
+{
+    return base + path;
+}
+
+function isSuccessCode(code:number) : boolean
+{
+    return code >= 200 && code < 300;
+} 
+
+function logTestStep(step:string) : void
+{
+    console.log("[STEP] " + step);
+}
+
+console.log(builEndpoint("https://api.com", "/users"));  // https://api.com/users
+console.log("200 is success:", isSuccessCode(200)); // 200 is success: true
+console.log("404 is success:", isSuccessCode(404)); // 404 is success: false
+logTestStep("Navigate to login page");  // [STEP] Navigate to login page

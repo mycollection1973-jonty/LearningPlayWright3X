@@ -242,8 +242,8 @@ Encapsulation in JavaScript — hiding data with private fields (`#`) and contro
 - `21_07_IQ.js` — IQ example: `User` class with a `greet()` method
 
 ### 22_OOPs_Inheritance
-Inheritance in JavaScript — organized into sub-topics:
-- **Single_Inheritance** — One class inheriting from one parent:
+Inheritance in JavaScript — organized into numbered sub-topics:
+- **01_Single_Inheritance** — One class inheriting from one parent:
   - `22_01_SI.js` — Single inheritance basics: `LoginPage extends BasePage`, inheriting `open()`/`close()` methods
   - `22_02_Example.js` — `super` usage: `super(name)` in the constructor and `super.foo()` to call parent methods
   - `22_03_IQ.js` — IQ example: method overriding — `APITest.setup()` overrides `BaseTest.setup()`
@@ -251,6 +251,56 @@ Inheritance in JavaScript — organized into sub-topics:
   - `22_05_IQ.js` — IQ example: polymorphism — `UnitTest`/`APITest`/`E2ETest` each override `execute()`
   - `22_06_IQ.js` — IQ example: page-object style `verify()` overrides for `LoginPage`/`DashboardPage`/`CartPage`
   - `22_07_IQ.js` — IQ example: report generators (`HTMLReport`/`JSONReport`/`TextReport`) overriding `generate()`
+- **02_Multiple_Inheritance** — Why JS has no multiple inheritance:
+  - `22_08_Example.js` — Multiple inheritance is not allowed (`extends F1, F2` is invalid); mixins are the alternative
+  - `22_09_Mixin_eg.js` — Mixin pattern: `LoggerMixin`/`ScreenshotMixin` factory functions composing a `SmartTest` class
+- **03_Multi_Level_Inheritance** — Inheritance chains (grandparent → parent → child):
+  - `22_10_Example.js` — `BasePage` → `AuthPage` → `AdminPage`: `AdminPage` inherits `open()` and `log()` (super in constructor)
+- **04_Hierarchical_Inheritance** — One parent, many children:
+  - `22_11_Example.js` — `Father` base class extended by `Son1`/`Son2`/`Son3` siblings
+
+### 23_OOPs_Polymorphism
+Polymorphism in JavaScript — method overriding, one method name behaving differently per class:
+- `23_01_Method_Overriding.js` — `APIPage.setup()` overrides `BaseTest.setup()` (each prints its own "Open Browser" message)
+
+### 24_OOPs_Interview
+OOP interview-style questions (JS + TS) — covers:
+- `24_01_EX1.js` — `Bug` class (title/severity) with a `display()` method
+- `24_02_EX2.js` — `Environment` class with default constructor parameters (`staging:3000`) building a URL
+- `24_03_EX3.js` — `User` class with a `greet()` method
+- `24_04_EX4.js` — Method chaining: `Counter` with `increment()`/`display()` returning `this`
+- `24_05_EX5.js` — `super` chain: `C` → `B` → `A` `who()` calls composing `"C> B> A"`
+- `24_06_IQ.ts` — TS functions with type annotations: `buildEndpoint`, `isSuccessCode`, `logTestStep`
+- `24_07_IQ.ts` — TS typed arrays: filtering failed HTTP codes (`400+`) with `filter`
+
+### 25_TypeScript
+TypeScript fundamentals — JS vs TS and type annotations:
+- `25_01_JS_Ex.js` — Plain JS reference: untyped variables and function
+- `25_02_TS_Ex.js` — Output of `tsc` compilation (strict-mode JS equivalent) for `25_02_TS_Ex.ts`
+- `25_02_TS_Ex.ts` — First TS example: `string`/`number` annotations on a variable and function
+- `25_03_Example.ts` — Function return type annotation (`: void`)
+- `25_04_Example.ts` — Primitive types (`string`, `number`, `boolean`, `null`, `undefined`), arrays (`number[]`, `Array<String>`), `any` vs `unknown`
+- `25_05_Example.ts` — Narrowing an `unknown` value with `typeof` checks
+- `25_06_Example.ts` — Function annotations: parameter and return types on `greet`
+- `25_07_Example.ts` — Arrow function annotations: typed `multiply`
+- `25_08_Example.ts` — Object annotations: inline `{name: string; age: number}` type
+- `25_09_Example.ts` — `: void` return annotation on `sayHello`
+- `25_10_Example.ts` — Function annotations: `greet` with a typed parameter and return value
+- `25_11_Example.ts` — The `never` type: functions that never return (infinite loop, `throw`)
+
+### 26_OOPs_TS_Abstraction
+Abstraction in TypeScript via interfaces — organized into sub-topics:
+- **Interface** — Interface fundamentals and use cases:
+  - `26_01_Abstraction_eg.ts` — Abstraction overview (interface/enums/abstract class) and a `User` interface typing multiple objects
+  - `26_02_Readonly.ts` — `readonly` properties: a `Point` interface whose `x`/`y` can't be modified after creation
+  - `26_03_Interface_PageObject.ts` — Interface inheritance: `LoginPage`/`FreeTrialPage` extend `BasePage` (page-object style with CSS selectors)
+  - `26_04_API_Response.ts` — Interface for API testing: `APIResponse` with required fields and an optional `headers?`
+  - `26_05_Method_Interface.ts` — Method signatures in interfaces: `Calculator` (`add`/`subtract`) and `India` (function-typed members)
+- Root files:
+  - `26_06_Interface_Hook.ts` — Callable interface: `TestHook` typed before/after test hook functions
+  - `26_07_Real_Config.ts` — Real config objects: `TestConfig` interface with optional `timeout?`/`retries?` (staging vs CI)
+  - `26_08_Class_Interface.ts` — `class TestCase implements Executable`: a class satisfying an interface contract (`run()`, `getStatus()`)
+  - `26_09_Interface_Misc.ts` — Index signatures: a `StringDictionary` interface for string-keyed objects
 
 ### PlayWright
 Playwright and automation-related material:
