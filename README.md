@@ -302,6 +302,30 @@ Abstraction in TypeScript via interfaces — organized into sub-topics:
   - `26_08_Class_Interface.ts` — `class TestCase implements Executable`: a class satisfying an interface contract (`run()`, `getStatus()`)
   - `26_09_Interface_Misc.ts` — Index signatures: a `StringDictionary` interface for string-keyed objects
 
+### 27_TS_ENUM
+Enums in TypeScript — named constants for real-world test data:
+- `27_01_ENUM_Example.ts` — `TestStatus` enum (`Pass`/`Fail`/`Skip`/`Pending`/`Blocked`) with string values
+- `27_02_ENUM_Example.ts` — `SeverityLevels` enum for bug severity (`low` → `blocking`)
+- `27_03_Real_ENUM.ts` — `Environment` enum holding environment base URLs (dev/staging/QA/prod)
+- `27_04_Real_Browser_PW.ts` — Playwright-style `Browser` enum with a `launchBrowser()` switch (Chromium/Gecko/Webkit)
+- `27_05_API_Real.ts` — `HTTPMethod` enum used in `sendRequest()` API calls
+
+### 28_TS_Generic
+Generics in TypeScript — reusable code that works with multiple types (`<T>`):
+- `28_01_Generic_Example.ts` — First generic function `getFirstResult<T>()` returning the first array item (numbers, strings, booleans; `!` non-null assertion)
+- `28_02_Generic_Class.ts` — Generic `TestDataStorage<T>` class: typed `add()`/`getFirst()`/`getAll()`/`count()` storing status codes or test names
+- `28_03_API_Response.ts` — Generic `wrapResponse<T>()` pairing a status code with typed data (string/boolean responses)
+
+### 29_TS_Private_Public_Protected
+Access modifiers in TypeScript classes (`public`/`private`/`protected`):
+- `29_01_PPP.ts` — `APIClient` class: `public baseURL`, `private apiKey` + `getAuthHeader()`, `protected timeout` accessible in subclasses
+- `29_02_PageObjectModel.ts` — Page-object model: `BasePage` with `protected baseURL`/`navigate()` used by `LoginPage.login()`
+- `29_03_Readonly.ts` — `PlayWrightConfig` with `private readonly` fields set once in the constructor
+
+### 31_TS_Abstract_Class
+Abstract classes in TypeScript — a base class with abstract (incomplete) methods forced on subclasses:
+- `31_01_Abstract.ts` — `abstract class BaseTest` declaring abstract `setup()`/`execute()`/`teardown()`/`loan()` plus a complete `loan1()`; `UITest` implements the required methods
+
 ### PlayWright
 Playwright and automation-related material:
 - VWO PRD document
